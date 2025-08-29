@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="main.js"></script>
+    <title>Location Editor</title>
+  </head>
+  <body>
+    <div id="head-container">
+      <b></b>
+      <h2>Web-Based Campus Path Finder</h2>
+      <b style="cursor: pointer;" onclick="logOut();">Log Out</b>
+    </div>
+    <div id="main-container">
+      <div class="section-container" id="location-list-container">
+        <h3>Loction Editor</h3>
+        <p>Edit or add new locations.</p>
+        <input
+          type="button"
+          value="Add a New Location"
+          class="btn"
+          onclick="addNewLocation();"
+        />
+
+        <div id="existing-locations-container">
+          <h4>Existing Locations</h4>
+          <div class="location-item">
+            <span>Location Name</span>
+            <span class="location-option">
+              <b>Edit</b> |
+              <b>Delete</b>
+            </span>
+          </div>
+
+          <div class="location-item">
+            <span>Location Name</span>
+            <span class="location-option">
+              <b>Edit</b> |
+              <b>Delete</b>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-container" id="editor-form-container">
+        <h3>Location Editor</h3>
+        <form class="form-container" id="editor-form">
+          <label class="form-field">
+            Building:
+            <select id="building-name-input">
+              <option>Main Building</option>
+              <option>Block B</option>
+              <option>Cafeteria</option>
+              <option>Hostel Block A</option>
+              <option>Engineering Block</option>
+              <option>Hostel Block B</option>
+              <option>Hostel Block C</option>
+              <option>Airport</option>
+              <option>Graduate School</option>
+              <option>GCTU Great Hall</option>
+              <option>Bush Canteen</option>
+              <option>Football Field</option>
+            </select> </label
+          ><br />
+          <label class="form-field">
+            Location image:
+            <input
+              type="text"
+              value="def-loc-img.jpg"
+              placeholder="Enter image file name"
+              id="location-image-name-input"
+            /> </label
+          ><br />
+          <label class="form-field">
+            Loction name:
+            <input
+              type="text"
+              placeholder="Enter location name"
+              id="location-name-input"
+            /> </label
+          ><br />
+          <label class="form-field">
+            Location Description:
+            <textarea
+              placeholder="Enter a short description of this location."
+              style="width: 150px; height: 50px"
+              id="location-description-input"
+            ></textarea>
+          </label>
+
+          <input
+            type="button"
+            value="Save Location"
+            class="btn"
+            onclick="saveLocation();"
+          />
+          <input
+            type="button"
+            value="Cancel"
+            class="btn"
+            onclick="location.reload();"
+          />
+        </form>
+      </div>
+      <!-- <input type="button" value="Save data" id="save-btn">
+      <input type="button" value="Loan data" id="load-btn"> -->
+    </div>
+  </body>
+  <script>
+    //checks if an admin is logged in by checking the activeUser value in sessionStorage
+    let activeUser = sessionStorage.getItem("activeUser");
+    if (activeUser === "admin") {
+      //allows the contents of the page to load
+    } else {
+      window.location.href = "admin-login-page.html";
+    }
+
+    //selects the editor form and location list containers
+    let editorFormContainer = document.getElementById("editor-form-container");
+    let locationListContainer = document.getElementById(
+      "location-list-container"
+    );
+    //hides the editor form
+    editorFormContainer.style.display = "none";
+
+    //selects the editor form inputs
+    let buildingNameInput = document.getElementById("building-name-input");
+    let locationImageNameInput = document.getElementById(
+      "location-image-name-input"
+    );
+    let locationNameInput = document.getElementById("location-name-input");
+    let locationDescriptionInput = document.getElementById(
+      "location-description-input"
+    );
+
+    //goes through the buildingDataArray and displays all existing locations under each building
+    function showAllExistingLocations() {
+      editorFormContainer.style.display = "none";
+      locationListContainer.style.display = "";
+      let existingLocationsContainer = document.getElementById(
+        "existing-locations-container"
+      );
+      existingLocationsContainer.innerHTML = `<h4>Existing Locations</h4>`;
+      
+      let sortedLocationsArray = sortLocationsAlphabetically();
+      sortedLocationsArray.map((item) => {
+        existingLocationsContainer.innerHTML += `
+        <div class="location-item">
+            <span>${item.name}</span>
+            <span class="location-option">
+              <b onclick='editLocation(${item.buildingIndex}, ${item.locationIndex});'>Edit</b> | 
+              <b onclick='deleteLocation(${item.buildingIndex}, ${item.locationIndex});' class='del-btn'>Delete</b>
+            </span>
+          </div>
+        `;
+      });
+
+      // buildingDataArray.map((item, index) => {
+      //   for (i = 0; i < item.locations.length; i++) {
+      //     existingLocationsContainer.innerHTML += `
+      //       <div class="location-item">
+      //       <span>${item.locations[i].name}</span>
+      //       <span class="location-option">
+      //         <b onclick='editLocation(${index}, ${i});'>Edit</b> | 
+      //         <b onclick='deleteLocation(${index}, ${i});'>Delete</b>
+      //       </span>
+      //     </div>
+      //       `;
+      //   }
+      // });
+    }
+
+    showAllExistingLocations();
+
+    //shows the location editor form and enables addition of a new location
+    function addNewLocation() {
+      editorFormContainer.style.display = "";
+      locationListContainer.style.display = "none";
+      editingLocation = false;
+      let editorForm = document.getElementById("editor-form").reset();
+    }
+
+    //temporarily stores building and location indexes of locations to be edited
+    let tempBuildingIndex = null,
+      tempLocationIndex = null;
+    let editingLocation = false;
+    //saves the entered location details
+    function saveLocation() {
+      //prompts user to replace '&' with 'and' to ensure the contents of the buildingDataArray are properly stored on the server
+      if(locationNameInput.value.includes('&')){
+        alert("Please replace '&' with 'and' in location name.");
+        return;
+      }
+      if(locationDescriptionInput.value.includes('&')){
+        alert("Please replace '&' with 'and' in location description.");
+        return;
+      }
+
+      let locationObj = {
+        image: locationImageNameInput.value,
+        name: locationNameInput.value,
+        description: locationDescriptionInput.value,
+      };
+
+      for (i = 0; i < buildingDataArray.length; i++) {
+        if (buildingDataArray[i].name === buildingNameInput.value) {
+          //adds new location details
+          buildingDataArray[i].locations.push(locationObj);
+          //deletes old location details if user is editing
+          if (editingLocation === true && tempBuildingIndex != null && tempLocationIndex != null) {
+            buildingDataArray[tempBuildingIndex].locations.splice(
+              tempLocationIndex,
+              1
+            );
+          }
+          break;
+        }
+      }
+      saveBuildingDataArray();
+      showAllExistingLocations();
+    }
+
+    //shows the location editor form and fills the fields with the selected location's details
+    function editLocation(buildingIndex, locationIndex) {
+      editorFormContainer.style.display = "";
+      locationListContainer.style.display = "none";
+      editingLocation = true;
+      tempBuildingIndex = buildingIndex;
+      tempLocationIndex = locationIndex;
+      let locationObj =
+        buildingDataArray[buildingIndex].locations[locationIndex];
+      buildingNameInput.value = buildingDataArray[buildingIndex].name;
+      locationImageNameInput.value = locationObj.image;
+      locationNameInput.value = locationObj.name;
+      locationDescriptionInput.value = locationObj.description;
+    }
+
+    //deletes the location element at the passed location index of the given building
+    function deleteLocation(buildingIndex, locationIndex) {
+      let res = confirm(
+        `Do you want to delete '${buildingDataArray[buildingIndex].locations[locationIndex].name}'?`
+      );
+      if (res === false) {
+        return;
+      }
+      buildingDataArray[buildingIndex].locations.splice(locationIndex, 1);
+      saveBuildingDataArray();
+      showAllExistingLocations();
+    }
+
+
+// document.getElementById("save-btn").addEventListener("click", 
+//   //save file
+// async () =>{
+//   // const response = await fetch("http://wordjumble.atwebpages.com/path-finder-data/save-data.php", {
+//   //   method: "POST",
+//   //   headers: { "Content-Type": "application/json" },
+//   //   body: JSON.stringify({content: buildingDataArray})
+//   // });
+
+//   // const result = await response.text();
+//   // alert(result);
+
+//   let stringBuildingDataArray = JSON.stringify(buildingDataArray);
+//   fetch("http://wordjumble.atwebpages.com/path-finder-data/save-data.php", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+//         },
+//         body: `data=${stringBuildingDataArray}`,
+//       })
+//       .then((response) => response.text())
+//       .then((res) => (console.log(res)));
+//  }
+// );
+
+    
+
+// document.getElementById("load-btn").addEventListener("click",
+//   //read file
+// async () => {
+//   const response = await fetch("http://wordjumble.atwebpages.com/path-finder-data/read-data.php");
+//   const text = await response.text();
+
+//   console.log(text);
+// }
+// )
+
+
+  </script>
+</html>

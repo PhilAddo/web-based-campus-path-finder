@@ -1,0 +1,524 @@
+#heading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  box-shadow: 0px 0.5px 5px gray;
+}
+
+#myCanvasCon {
+  margin-top: 65px;
+  position: relative;
+  width: 100%;
+  overflow: auto;
+}
+
+#myCanvas {
+  border: 1px solid black;
+  position: relative;
+}
+
+#posLog {
+  width: 100%;
+  height: 200px;
+  border: 1px solid black;
+  overflow: scroll;
+}
+
+table,
+td {
+  border: 0px solid lightgray;
+  border-collapse: collapse;
+  padding: 10px;
+  font-size: 20px;
+  width: 100%;
+  text-align: center;
+  height: 40px;
+}
+
+#titleBar {
+  background-color: rgb(7, 18, 160);
+  color: white;
+}
+
+#closeSideMenuBtn {
+  font-size: 35px;
+  display: none;
+}
+
+#searchArea {
+  display: none;
+}
+
+#selectionArea {
+  display: none;
+  border: 0px solid rgb(7, 18, 160);
+  color: white;
+  background-color: rgb(7, 18, 160);
+  padding: 10px;
+}
+
+#usePointBtn {
+  width: 70%;
+  color: white;
+  background-color: rgb(7, 18, 160);
+  border-radius: 5px;
+}
+
+#returnIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  background-color: rgb(7, 18, 160);
+  color: white;
+  padding: 3px;
+  border-radius: 0px 0px 8px 8px;
+}
+
+.searchField {
+  border: 1px solid rgb(7, 18, 160);
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+}
+
+.locResult {
+  border: 1px solid white;
+  padding: 8px;
+  display: block;
+  width: 100%;
+  background-color: rgb(7, 18, 160);
+  color: white;
+}
+
+.desResult {
+  border: 1px solid white;
+  padding: 8px;
+  display: block;
+  width: 100%;
+  background-color: rgb(7, 18, 160);
+  color: white;
+}
+
+#altOptions {
+  display: none;
+}
+
+.altOpt {
+  border: 1px solid white;
+  padding: 8px;
+  display: block;
+  width: 100%;
+  background-color: rgb(7, 18, 160);
+  color: white;
+}
+
+#sideMenu {
+  color: white;
+  background-color: rgb(7, 18, 160);
+  width: 80%;
+  height: 1000px;
+  display: none;
+  cursor: default;
+  overflow: scroll;
+}
+
+.sideMenuOpt {
+  padding: 5px;
+}
+
+#sideMenu .sideMenuOpt:hover {
+  color: rgb(7, 18, 160);
+  background-color: white;
+}
+
+#locMenuCon {
+  border: 0.1px solid white;
+  height: 400px;
+  overflow: scroll;
+}
+
+.locMenu {
+  position: fixed;
+  top: 60px;
+  left: 0px;
+  bottom: 0px;
+  border: 0.1px solid lightgray;
+  border-radius: 8px 8px 0px 0px;
+  width: 100%;
+  background-color: white;
+  overflow: auto;
+  display: none;
+}
+
+.locMenu .buildName {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  background-color: rgb(7, 18, 160);
+  border-radius: 8px 8px 0px 0px;
+}
+
+.buildImg {
+  width: 70%;
+  height: 300px;
+  display: block;
+}
+
+.loc {
+  width: 100%;
+}
+
+.locName {
+  display: block;
+  color: white;
+  background-color: rgb(7, 18, 160);
+  padding: 5px;
+}
+
+.locDetail {
+  width: 48%;
+  height: 200px;
+  display: inline-block;
+  overflow: scroll;
+}
+
+#fireProcedure {
+  height: 200px;
+  display: inline-block;
+}
+
+.locDesc {
+  font-size: 15px;
+  padding: 5px;
+  margin: 10px;
+}
+
+.closeBtn {
+  cursor: default;
+  font-size: 35px;
+  margin: 7px;
+}
+
+#notFound {
+  border: 1px solid rgb(7, 18, 160);
+  display: block;
+  background-color: white;
+  color: red;
+  padding: 5px;
+}
+
+#getPosBtn {
+  color: white;
+  background-color: rgb(7, 18, 160);
+  width: 70%;
+  font-size: 18px;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+@keyframes highlightAnim {
+  50% {
+    color: rgb(7, 18, 160);
+    background-color: white;
+  }
+}
+
+/* styles for smaller screens */
+@media screen and (max-width: 480px) {
+  .locDetail {
+    width: 100%;
+    height: 150px;
+    display: block;
+    overflow: scroll;
+  }
+
+  .buildImg {
+    width: 80%;
+    height: 200px;
+    display: block;
+  }
+
+  .cred-container {
+    width: 90%;
+  }
+  .section-container {
+    width: 90%;
+  }
+  .form-container {
+    width: 100%;
+  }
+}
+
+/*----*/
+.form-container {
+  width: 50%;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.building-item:hover{
+  background-color: lightblue;
+}
+
+.path-item:hover{
+  background-color: lightblue;
+}
+
+.path-item, .building-item{
+  padding: 5px;
+  cursor: pointer;
+}
+
+#path-editor-options-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.path-editor-option{
+  padding: 5px;
+  margin: 5px;
+  background-color: rgb(7, 18, 160);
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn {
+  font-weight: bold;
+  padding: 5px;
+  background-color: rgb(7, 18, 160);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.large-btn{
+  font-weight: bold;
+  font-size: larger;
+  padding: 15px; 
+  background-color: rgb(7, 18, 160);
+  color: white;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer; 
+}
+
+#loc-info-container{
+  position: fixed;
+  top: 60px;
+  left: 0px;
+  bottom: 0px;
+  border: 0.1px solid lightgray;
+  border-radius: 8px 8px 0px 0px;
+  width: 100%;
+  background-color: white;
+  overflow: auto;
+}
+
+#loc-info-container .buildName {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  background-color: rgb(7, 18, 160);
+  border-radius: 8px 8px 0px 0px;
+}
+
+#loc-name-container{
+  left: 0px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  background-color: rgb(7, 18, 160);
+  border-radius: 8px 8px 0px 0px;
+}
+
+#flexible-container-parent{
+  display: flex;
+  flex-direction: row;
+}
+.flexible-container{
+  width: 40%;
+  overflow: scroll;
+}
+
+/* admin log in page styles */
+body {
+  margin: 0px;
+}
+
+#head-container {
+  padding: 5px;
+  background-color: rgb(7, 18, 160);
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#sch-logo {
+  width: 60px;
+  height: 60px;
+}
+
+#main-container {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.section-container {
+  width: 80%;
+  padding: 5px;
+  margin: 5px;
+  background-color: white;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+#cred-body-container {
+  z-index: 0;
+  width: 100%;
+  height: 600px;
+  background-image: url(img/gt_map_sat_view.png);
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#blur-element {
+  z-index: 1;
+  opacity: 0.4;
+  position: absolute;
+  width: 100%;
+  height: 600px;
+  border-radius: 5px;
+  background-color: black;
+  /* backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px); */
+}
+
+.cred-container {
+  z-index: 2;
+  position: relative;
+  width: 50%;
+  padding: 5px;
+  background-color: white;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.link {
+  color: rgb(7, 18, 160);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.text-input {
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.text-input-short {
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 50px;
+}
+
+#existing-locations-container{
+  width: 50%;
+}
+
+.location-item{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid lightblue;
+  border-radius: 5px;
+}
+.location-option{
+  cursor: pointer;
+}
+
+/* table {
+  width: auto;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: rgb(7, 18, 160);
+  color: white;
+  padding: 4px;
+}
+
+td {
+  cursor: pointer;
+  border-bottom: 0.5px solid lightgrey;
+  text-align: left;
+  padding: 5px;
+}
+tr:hover {
+  background-color: whitesmoke;
+} */
+
+/* styles for smaller screens */
+@media (max-width: 450px) {
+  .cred-container {
+    width: 90%;
+  }
+  .section-container {
+    width: 90%;
+  }
+  .form-container {
+    width: 100%;
+  }
+  #processing-gif {
+    width: 100%;
+    height: auto;
+  }
+  #existing-locations-container{
+  width: 100%;
+  }
+  #flexible-container-parent{
+  display: flex;
+  flex-direction: column;
+}
+  .flexible-container{
+  width: 90%;
+}
+}

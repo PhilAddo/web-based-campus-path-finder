@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="main.js"></script>
+    <title>Path Editor</title>
+  </head>
+  <body>
+    <div id="head-container">
+      <b></b>
+      <h2>Web-Based Campus Path Finder</h2>
+      <b style="cursor: pointer" onclick="logOut();">Log Out</b>
+    </div>
+    <div id="main-container">
+      <h3>Path Editor</h3>
+      <div id="flexible-container-parent">
+        <!--map canvas-->
+        <div class="section-container flexible-container">
+          <center>
+            <div id="myCanvasCon">
+              <canvas id="myCanvas" width="430" height="648">
+                Your browser does not support the HTML 5 canvas tag
+              </canvas>
+            </div>
+          </center>
+        </div>
+
+        <div class="section-container flexible-container">
+          <div id="building-menu-container">
+            <div id="building-list">
+              <b>Select a building to edit its paths</b>
+              <p class="building-item">Main building</p>
+              <p class="building-item">Block B</p>
+              <p class="building-item">Cafeteria</p>
+            </div>
+          </div>
+
+          <div id="path-menu-container">
+            <h4 id="building-name">Building Name</h4>
+            <input
+              type="button"
+              class="btn"
+              value="Return To Building List"
+              onclick="location.reload()"
+            />
+            <div id="path-editor-options-container">
+              <input
+                type="button"
+                value="Enable Path Editing"
+                onclick="togglePathEditing()"
+                id="path-editing-btn"
+                class="path-editor-option"
+              />
+              <input
+                type="button"
+                value="Add Path"
+                onclick="addPath()"
+                class="path-editor-option"
+              />
+              <input
+                type="button"
+                value="Toggle All Path Drawing"
+                onclick="toggleAllPathDrawing()"
+                class="path-editor-option"
+              />
+              <input
+                type="button"
+                value="Undo Path"
+                onclick="undoPath()"
+                class="path-editor-option"
+              />
+            </div>
+            <br />
+
+            <div id="path-list">
+              <b>Click on a path name to delete it</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="array-content">
+
+      </div>
+
+      <!--map image tag-->
+      <img
+        id="map"
+        src="img/gt_map.png"
+        width="250"
+        height="250"
+        style="display: none"
+      />
+      <img src="img/google_logo.png" id="googleLogo" style="display: none" />
+    </div>
+  </body>
+  <script>
+    //checks if an admin is logged in by checking the activeUser value in sessionStorage
+    let activeUser = sessionStorage.getItem("activeUser");
+    if (activeUser === "admin") {
+      //allows the contents of the page to load
+    } else {
+      window.location.href = "admin-login-page.html";
+    }
+
+    let buildingMenuContainer = document.getElementById(
+      "building-menu-container"
+    );
+    let pathMenuContainer = document.getElementById("path-menu-container");
+
+    var posX = 0,
+      posY = 0;
+    var bgX = 0,
+      bgY = 0;
+    let startX = 0;
+    let startY = 0;
+    let endX = -50;
+    let endY = -50;
+    let userX = 0;
+    let userY = 0;
+
+    let pathEditing = false;
+
+    let pathArr = [
+      {
+        id: "",
+        x: [],
+        y: [],
+      },
+    ];
+
+    let tempPathObj = {
+      id: "",
+      x: [],
+      y: [],
+    };
+
+    //stores the index of the currently selected building
+    let currentBuildingIndex = null;
+
+    function togglePathEditing() {
+      let pathEditingBtn = document.getElementById("path-editing-btn");
+      if (pathEditing === true) {
+        pathEditingBtn.value = "Enable Path Editing";
+        pathEditing = false;
+      } else {
+        pathEditingBtn.value = "Disable Path Editing";
+        pathEditing = true;
+      }
+    }
+
+    function toggleAllPathDrawing() {
+      if (drawAll === true) {
+        drawAll = false;
+      } else {
+        drawAll = true;
+      }
+    }
+
+    //draws path of points passed to it
+    function drawPath(arrayObj) {
+      if (arrayObj.x != undefined) {
+        for (i = 0; i < arrayObj.x.length; i++) {
+          context.beginPath();
+          context.moveTo(arrayObj.x[i], arrayObj.y[i]);
+          context.lineTo(arrayObj.x[i + 1], arrayObj.y[i + 1]);
+          context.strokeStyle = "red";
+          context.stroke();
+        }
+      }
+    }
+
+    //deletes the path with the passed ID
+    function deletePath(id) {
+      let res = confirm(`Do you want to delete Path-${id}?`);
+      if (res === false) {
+        return;
+      }
+      let pathArray = buildingDataArray[currentBuildingIndex].paths;
+      for (i = 0; i < pathArray.length; i++) {
+        if (pathArray[i].id == id) {
+          pathArray.splice(i, 1);
+          listPaths(currentBuildingIndex);
+          return;
+        }
+      }
+    }
+
+    //displays a list of created paths
+    function listPaths(buildingIndex) {
+      //checks if the selected building has paths created for it
+      let pathList = document.getElementById("path-list");
+      pathList.innerHTML = "<b>Click on a path name to delete it</b><br>";
+      if (buildingDataArray[buildingIndex].paths.length === 0) {
+        pathList.innerHTML += "<i>No paths available.</i>";
+        return;
+      }
+
+      buildingDataArray[buildingIndex].paths.map((item) => {
+        pathList.innerHTML += `
+        <p onclick="deletePath('${item.id}')" class="path-item">Path-${item.id}</p>
+        `;
+        console.log(buildingDataArray[buildingIndex].paths);
+      });
+      pathArr = buildingDataArray[buildingIndex].paths;
+      //drawAllPaths(pathArray);
+    }
+
+    let drawAll = true;
+    //draws all paths of path objects passed to it
+    function drawAllPaths(pathArray) {
+      if (drawAll === false) {
+        return;
+      }
+      // pathEditing = true;
+      pathArray.map((item) => {
+        drawPath(item);
+      });
+    }
+
+    //removes points from the tempPathObj
+    function undoPath() {
+      tempPathObj.x.pop();
+      tempPathObj.y.pop();
+    }
+
+    //adds the values in the temporary path object to the main path array and resets the temporary path object
+    function addPath() {
+      if (currentBuildingIndex === null) {
+        alert("Please select a building to add paths.");
+        return;
+      }
+      if (tempPathObj.id === "") {
+        alert("Please create a path first.");
+        return;
+      }
+      buildingDataArray[currentBuildingIndex].paths.push(tempPathObj);
+      tempPathObj = {
+        id: "",
+        x: [],
+        y: [],
+      };
+      alert("Path added!");
+      listPaths(currentBuildingIndex);
+      saveBuildingDataArray();
+    }
+
+    class LocationObj {
+      constructor(image, name, description) {
+        (this.image = image),
+          (this.name = name),
+          (this.description = description);
+      }
+    }
+
+    var canvas = document.getElementById("myCanvas");
+
+    let context = canvas.getContext("2d");
+
+    context.lineWidth = 3;
+
+    window.onload = drawMe();
+    showAllBuildings();
+
+    var t = Date.now();
+    var timePassed = 0;
+    var dir = 0;
+
+    function drawMe() {
+      //calculating for frames per second
+      timePassed = (Date.now() - t) / 1000;
+      t = Date.now();
+      var fps = Math.round(1 / timePassed);
+
+      //clears the canvas for redraw
+      context.clearRect(0, 0, 650 * 2, 450 * 2);
+
+      //draws map image
+      const myMap = document.getElementById("map");
+      context.drawImage(myMap, bgX, bgY, 430, 648);
+
+      drawPath(tempPathObj);
+      drawAllPaths(pathArr);
+
+      //draws google logo
+      const googleLogo = document.getElementById("googleLogo");
+      context.drawImage(googleLogo, 10, 610, 60, 30);
+
+      //writes names of buildings
+      context.font = "13px Arial";
+      context.fillStyle = "slategray";
+      context.fillText("Main Building", 110, 140);
+      context.fillText("Engineering Block", 200, 300);
+      context.fillText("Block B", 60, 220);
+      context.fillText("Cafeteria", 50, 340);
+      context.fillText("Hostel Block A", 50, 400);
+      context.fillText("Hostel Block B", 140, 460);
+      context.fillText("Hostel Block C", 200, 430);
+      context.fillText("Airport", 240, 380);
+      context.fillText("Graduate School", 270, 360);
+      context.fillText("Football Field", 140, 580);
+      /*
+//draws destination icon at destination
+context.font = "20px FontAwesome";
+context.fillText('\uF041', endX, endY);
+*/
+      //draws rectangular background for destination text
+      context.beginPath();
+      context.rect(endX, endY, 110, 20);
+      context.fillStyle = "dodgerblue";
+      context.fill();
+      //writes text
+      context.font = "13px FontAwesome";
+      context.fillStyle = "white";
+      context.fillText("\uF041 View destination", endX + 2, endY + 15);
+
+      //draws users at location 🔵 ⬤
+
+      context.font = "30px Arial";
+      context.fillStyle = "dodgerblue";
+      context.fillText("⬤", userX, userY);
+
+      showPathIDs();
+
+      /*
+[used to draw user's position on the map]
+checks if values are greater than or equal to minimum
+and less than or equal to maximum (Prevents user from being placed outside the map)
+*/
+      if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
+        var longUnit = (0.22408 - 0.22214) / 430;
+        var longDist = 0.22408 - Math.abs(posX);
+        userX = Math.ceil(longDist / longUnit);
+      }
+      if (posY >= 5.59458 && posY <= 5.5975) {
+        var latUnit = (5.5975 - 5.59458) / 648;
+        var latDist = 5.5975 - posY;
+        userY = Math.ceil(latDist / latUnit);
+      }
+
+      //displays path IDs
+      function showPathIDs() {
+        pathArr.map((item) => {
+          context.font = "12px Arial";
+          context.fillText(item.id, item.x[0], item.y[0]);
+        });
+      }
+
+      //used to create animation
+      window.requestAnimationFrame(drawMe);
+    }
+
+    canvas.addEventListener("mousedown", function (e) {
+      getMousePosition(canvas, e);
+    });
+
+    /*reads the position of the mouse on the canvas*/
+    function getMousePosition(canvas, event) {
+      let rect = canvas.getBoundingClientRect();
+      x = event.clientX - rect.left;
+      y = event.clientY - rect.top;
+      if (pathEditing === true) {
+        //adds points to the tempPathObj
+        tempPathObj.id = generateID();
+        tempPathObj.x.push(x);
+        tempPathObj.y.push(y);
+      }
+    }
+
+    //generates random numbers to be used as path IDs
+    function generateID() {
+      let id = `${Math.ceil(Math.random() * 1000)}-${Math.ceil(
+        Math.random() * 1000
+      )}`;
+      return id;
+    }
+
+    function showAllBuildings() {
+      buildingMenuContainer.style.display = "";
+      pathMenuContainer.style.display = "none";
+
+      let buildingList = document.getElementById("building-list");
+      buildingList.innerHTML = `<b>Select a building to edit its paths</b>`;
+      buildingDataArray.map((item, index) => {
+        buildingList.innerHTML += `
+        <p class="building-item" onclick='showPathMenu(${index});'>${item.name}</p>
+        `;
+      });
+    }
+
+    //shows the path menu for the selected building
+    function showPathMenu(buildingIndex) {
+      buildingMenuContainer.style.display = "none";
+      pathMenuContainer.style.display = "";
+      let buildingName = (document.getElementById("building-name").innerHTML =
+        buildingDataArray[buildingIndex].name);
+      currentBuildingIndex = buildingIndex;
+      listPaths(buildingIndex);
+
+    }
+  </script>
+</html>

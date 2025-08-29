@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <title>Web-Based Campus Path Finder</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="main.js"></script>
+</head>
+
+<body>
+  <!--heading section-->
+  <div id="heading">
+    <table id="titleBar">
+      <tr>
+        <td style="width: 20%; cursor: default">
+          <span id="openSideMenuBtn"><i class="fa fa-bars" aria-hidden="true" onclick="showSideMenu();"></i><span
+              class="altTxt" onclick="showSideMenu();">menu</span></span><span id="closeSideMenuBtn"
+            onclick="hideSideMenu();">&times</span>
+        </td>
+        <td style="width: 60%"><b>Web-Based Campus Path Finder</b></td>
+        <td style="width: 20%; cursor: default">
+          <i class="fa fa-search" aria-hidden="true" onclick="showSearch();"></i><span class="altTxt"
+            onclick="showSearch();">search</span>
+        </td>
+      </tr>
+    </table>
+
+    <!--search box and options-->
+    <div id="searchArea">
+      <input type="search" id="location" placeholder="Enter location" class="searchField" oninput="searchLoc();"
+        onclick="showAltOptions();" onblur="hideAltOptions();" /><br />
+      <input type="search" id="destination" placeholder="Enter Destination" class="searchField" oninput="searchDes();"
+        onblur="hideAltOptions();" /><br />
+      <div id="searchResults"></div>
+      <div id="altOptions">
+        <b class="altOpt" onclick="getPos();">Get current location</b>
+        <b class="altOpt" onclick="showSelectionArea();">Choose on map</b>
+      </div>
+      <div id="returnIcon" style="cursor: default" onclick="showTitle();">
+        <i class="fa fa-angle-up" aria-hidden="true"></i><span class="altTxt"
+          style="color: white; background-color: rgb(7, 18, 160); padding: 3px">hide</span>
+      </div>
+    </div>
+
+    <!--selection area-->
+    <div id="selectionArea">
+      <span>Click on a point on the map to set as your location and click on the
+        button below to proceed.</span><br />
+      <center>
+        <input type="button" value="Use point" id="usePointBtn" onclick="hideSelectionArea();" />
+      </center>
+    </div>
+
+    <!--side menu-->
+    <div id="sideMenu">
+      <div class="sideMenuOpt" onclick="clearPaths();">
+          Clear Paths
+        </div>
+      <!--locations menu-->
+      <details>
+        <summary class="sideMenuOpt">Locations</summary>
+        <ul style="list-style-type: none" id="locMenuCon">
+        </ul>
+      </details>
+      <!--Emergency information menu-->
+      <div class="sideMenuOpt" onclick="showLocMenu(0,0);">
+          Emergency Information Menu
+        </div>
+      <div class="sideMenuOpt" onclick="location='admin-login-page.html'">Administrator Log In</div>
+    </div>
+  </div>
+
+  <!--map canvas-->
+  <center>
+    <div id="myCanvasCon">
+      <canvas id="myCanvas" width="430" height="648">
+        Your browser does not support the HTML 5 canvas tag
+      </canvas>
+    </div>
+  </center>
+
+  <!--main building location contents-->
+  <div class="locMenu" id="mainBuilding">
+  </div>
+
+
+  <!--Emergency contacts menu-->
+  <div class="locMenu" id="emergencyMenu">
+    <span class="buildName"><span class="closeBtn" onclick="hideLocMenu();">&times</span> Emergency
+      Menu</span><br /><br /><br />
+    <center>
+      <img class="buildImg" src="img/def-loc-img.jpg" />
+    </center>
+    <p class="locDesc">
+      In case of an emergency, access the emergency contacts and follow the
+      emergency response procedures below for your safety.
+    </p>
+    <hr />
+    <div class="loc">
+      <b class="locName">Emergency Contacts</b>
+      <!--<img src="Images/place.jpg" class="locDetail">-->
+      <div class="locDetail">
+        <p class="locDesc">Police - 112/ 191/ 18555</p>
+        <p class="locDesc">Fire - 112/ 192</p>
+        <p class="locDesc">Ambulance - 112/ 193</p>
+      </div>
+    </div>
+
+    <div class="loc">
+      <b class="locName">Emergency Response Procedures</b>
+      <!--<img src="Images/place.jpg" class="locDetail">-->
+      <div id="fireProcedure">
+        <div style="margin: 8px"><b>Fire outbreak response procedure</b></div>
+        <ol style="margin: 10px">
+          <li>Inform people in the immediate area to evacuate.</li>
+          <br />
+          <li>
+            If you witness a fire, activate the nearest building fire alarm
+            and exit the building.
+          </li>
+          <br />
+          <li>When safe, immediately call 112/ 192.</li>
+          <br />
+          <li>
+            If the fire is small (wastebasket sized or smaller) and you have
+            been trained to use a fire extinguisher, you may attempt to
+            extinguish the fire. Make sure that you have a safe exit from the
+            fire area If you cannot put out the fire in 5 seconds, evacuate.
+          </li>
+          <br />
+          <li>On your way out, warn others.</li>
+          <br />
+          <li>
+            Move away from fire and smoke. Close doors and windows behind you,
+            if time permits.
+          </li>
+          <br />
+          <li>
+            Before opening a door, place the back of your hand on the door to
+            check for heat. If cool, slowly check the door handle for heat and
+            proceed to exit.
+          </li>
+          <br />
+          <li>
+            If the door is hot, do not open it. Find or create an alternative
+            exit (windows). If no other exit is available and you only see
+            smoke, open the door slowly, move to a crawling position, staying
+            low, and quickly crawl to an exit.
+          </li>
+          <br />
+          <li>
+            If the door is hot and fire is present, keep the door shut. Place
+            any type material at the base of the door to keep smoke from
+            entering the room.
+          </li>
+          <br />
+          <li>Exit using stairs. Do not use elevators during a fire.</li>
+          <br />
+          <li>
+            Evacuate the building as soon as the alarm sounds and proceed to
+            the designated evacuation zone.
+          </li>
+          <br />
+          <li>
+            Do not re-enter the building or work area until you have been
+            instructed to do so by the emergency responders.
+          </li>
+          <br />
+          <li>
+            To use a fire extinguisher, remember the acronym <b>PASS:</b>
+          </li>
+          <br />
+          <div><b>P - PULL</b> safety pin from handle.</div>
+          <div><b>A - AIM</b> nozzle at base of fire.</div>
+          <div><b>S - SQUEEZE</b> the trigger handle.</div>
+          <div><b>S - SWEEP</b> from side to side</div>
+        </ol>
+        <p style="margin: 8px">
+          <i>This sample was taken from
+            <a
+              href="https://www.csusm.edu/em/procedures/fire.html">https://www.csusm.edu/em/procedures/fire.html</a></i>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--get position button element-->
+  <center>
+    <input type="button" value="⦿ Get position" onclick="getPos();" id="getPosBtn" /><br />
+  </center>
+
+  <div id="loc-info-container" style="display: none;">
+    <div class="loc">
+      <b id="loc-name-container"><span class="closeBtn" onclick="hideMenu('loc-info-container');">&times</span> Location
+        Name</b>
+      <img src="img/def-loc-img.jpg" class="locDetail" />
+      <div class="locDetail">
+        <p class="locDesc">
+          Location: <b>Building Name</b>
+        </p>
+        <p class="locDesc">This is a brief description of this location. It provides relevant information about this
+          location to the user.</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <i id="status"></i><br /><br />
+  <i id="accuracyNote"></i><br /><br />
+
+  <div id="posLog"></div>
+  <br />
+
+  <!--map image tag-->
+  <img id="map" src="img/gt_map.png" width="100%" height="250" style="display: none" />
+  <img src="img/google_logo.png" id="googleLogo" style="display: none" />
+
+  <!--
+<iframe src="https://www.google.com/maps/d/u/0/embed?mid=1mfyOF-sjU8K_CdmaUe4gCL2WAOSfhuEq&ehbc=2E312F" width="640" height="480"></iframe>
+-->
+</body>
+<script text="text/JavaScript">
+  //sets the default value of the active user value in session storage
+  sessionStorage.setItem("activeUser", "user");
+
+  var posX = 0,
+    posY = 0;
+  var bgX = 0,
+    bgY = 0;
+
+  var pathArrY = [120, 200, 280],
+    smallVal = 0,
+    shortPath = 0,
+    starting = 0;
+
+  //stores points created
+  var pointArrX = [],
+    pointArrY = [],
+    pointArrInd = 0;
+
+  var bdPointArrX = [],
+    bdPointArrY = [];
+
+  var currX = 0,
+    currY = 0;
+  var startX = 100,
+    startY = 220,
+    endX = -50,
+    endY = -50;
+
+  var userX = 100,
+    userY = 220;
+
+  var pointsCreated = false;
+
+  const titleBar = document.getElementById("titleBar");
+  const searchArea = document.getElementById("searchArea");
+  const sideMenu = document.getElementById("sideMenu");
+  const selectionArea = document.getElementById("selectionArea");
+  const openSideMenuBtn = document.getElementById("openSideMenuBtn");
+  const closeSideMenuBtn = document.getElementById("closeSideMenuBtn");
+
+  //shows title bar and hides search area
+  function showTitle() {
+    titleBar.style.display = "";
+    searchArea.style.display = "none";
+  }
+  //shows search area and hides title bar
+  function showSearch() {
+    titleBar.style.display = "none";
+    searchArea.style.display = "block";
+  }
+  //shows side menu
+  function showSideMenu() {
+    sideMenu.style.display = "block";
+    openSideMenuBtn.style.display = "none";
+    closeSideMenuBtn.style.display = "block";
+  }
+  //hides side menu
+  function hideSideMenu() {
+    sideMenu.style.display = "none";
+    openSideMenuBtn.style.display = "block";
+    closeSideMenuBtn.style.display = "none";
+  }
+
+  //stores values of groups
+  var grpArr = [0, 0, 0];
+  //used with filter to set places to be displayed
+  function setGrp(ind) {
+    for (i = 0; i < grpArr.length; i++) {
+      if (i == ind) {
+        grpArr[i] = 1;
+      } else {
+        grpArr[i] = 0;
+      }
+    }
+    hideSideMenu();
+  }
+
+  //contains locations available on the map
+  var locationsArr = [
+    "Main Building",
+    "Block B",
+    "Cafeteria",
+    "Hostel Block A",
+    "Engineering Block",
+    "Hostel Block B",
+    "Hostel Block C",
+    "Airport",
+    "Graduate School",
+    "GCTU Great Hall",
+    "Bush Canteen",
+    "Football Field",
+    //main building locations
+    "Executive Wing",
+    "Head, Human Resource",
+    "A.G Director, Works & Physical Development",
+    "Main Building Washrooms - Top",
+    "Dep. Director of Finance",
+    "Internal Audit",
+    "HR. Department",
+    "Information Technology Support Services Office",
+    "Library",
+    "Information Center",
+    "Dr. Eva Von Hirsch Auditorium",
+    "GCTU Bookshop",
+    "Admissions Office",
+    "Accounts Reconciliation",
+    "Office of the Dean of Student Affairs",
+    "President's Conference Room",
+    "Accounts Receivable/ Accounts Office",
+    "Video Conference Center",
+    "Main Building Washrooms - Ground",
+    "Graduate Resource Center",
+    //block b locations
+    "Lectures Resource Center",
+    "Academic Affairs Directorate",
+    "Switching Lab",
+    "Block B Washrooms - Ground",
+    "CPD Office",
+    "Computer Lab",
+    "Center for Online Learning and Teaching (COLT)",
+    "Software Systems Unit",
+    "Security Office",
+    "B1",
+    "B2",
+    "Block B Washrooms - Top",
+    "Final Year Project Room",
+    "B3",
+    "B4",
+    //cafeteria locations
+    "GCTU Radio",
+    //engineering block locations
+    "HOD - Computer Engineering",
+    "HOD - Electrical/ Electronics Engineering",
+    "HOD - Telecom Engineering",
+    "Office of the Dean Faculty of Engineering",
+    "Electronics Lab",
+    "Energy Systems Lab",
+    "Reprographic Center",
+    "Engineering Conference Center",
+  ];
+  const searchResults = document.getElementById("searchResults");
+  const altOptions = document.getElementById("altOptions");
+
+  //searches location array to set user's location
+  function searchLoc() {
+    var location = document
+      .getElementById("location")
+      .value.toUpperCase()
+      .trim();
+
+    var searchResults = document.getElementById("searchResults");
+    searchResults.innerHTML = "";
+
+    let locArray = sortLocationsAlphabetically();
+
+    for (x = 0; x < locArray.length; x++) {
+      var ind = locArray[x].name.toUpperCase().indexOf(location);
+      if (ind > -1 && location != "") {
+        // var loc = document.createElement("b");
+        // loc.innerHTML = locArray[x].name;
+        // loc.className = "locResult";
+        // searchResults.appendChild(loc);
+        //--
+        searchResults.innerHTML += `
+        <b class='locResult' onclick='setLocation2(${locArray[x].buildingIndex})'>${locArray[x].name}</b>
+        `;
+        altOptions.style.display = "none";
+      }
+    }
+
+    if (searchResults.innerHTML == "" && location != "") {
+      searchResults.innerHTML = `<i id="notFound">Sorry no results for "${location}" was found</i>`;
+    } else if (location == "") {
+      altOptions.style.display = "block";
+    }
+    //setLocation();
+  }
+
+  //searches location array to set user's destination
+  function searchDes() {
+    var destination = document
+      .getElementById("destination")
+      .value.toUpperCase()
+      .trim();
+
+    var searchResults = document.getElementById("searchResults");
+    searchResults.innerHTML = "";
+
+    let locArray = sortLocationsAlphabetically();
+
+    for (x = 0; x < locArray.length; x++) {
+      var ind = locArray[x].name.toUpperCase().indexOf(destination);
+      if (ind > -1 && destination != "") {
+        // var loc = document.createElement("b");
+        // loc.innerHTML = locationsArr[x];
+        // loc.className = "desResult";
+        // searchResults.appendChild(loc);
+        //--
+        searchResults.innerHTML += `
+        <b class='desResult' onclick='setDestination2(${locArray[x].buildingIndex}, ${x})'>${locArray[x].name}</b>
+        `;
+        altOptions.style.display = "none";
+      }
+    }
+
+    if (searchResults.innerHTML == "" && destination != "") {
+      searchResults.innerHTML = `<i id="notFound">Sorry no results for "${destination}" was found</i>`;
+    } else if (destination == "") {
+      //searchResults.innerHTML="<i>Please enter a location to search for</i>";
+    }
+  }
+
+  function showAltOptions() {
+    setTimeout(function () {
+      altOptions.style.display = "block";
+    }, 500);
+  }
+  function hideAltOptions() {
+    setTimeout(function () {
+      altOptions.style.display = "none";
+      searchResults.innerHTML = "";
+      setLocation();
+    }, 500);
+  }
+
+  //hides alt text if FontAwesome icons are loaded
+  function checkFontA() {
+    setTimeout(chk, 1000);
+    function chk() {
+      let fa = document.getElementsByClassName("fa");
+      let altTxt = document.getElementsByClassName("altTxt");
+
+      //used to check CSS properties
+      function css(element, property) {
+        return window
+          .getComputedStyle(element, null)
+          .getPropertyValue(property);
+      }
+
+      if (css(fa[0], "font-family") !== "FontAwesome") {
+        //alert("not loaded");
+      } else {
+        //hides alt texts
+        for (i = 0; i < altTxt.length; i++) {
+          altTxt[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  //---------
+  let pathEditing = false;
+
+  //contains the names of buildings, locations within the buildings and paths which leads to the buildings
+  // let buildingDataArray = [
+  //   {
+  //     name: "Main Building",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     locations: [
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Executive Wing",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Head, Human Resource",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "A.G Director, Works & Physical Development",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Main Building Washrooms - Top",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Dep. Director of Finance",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Internal Audit",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "HR. Department",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Information Technology Support Services Office",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Library",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Information Center",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Dr. Eva Von Hirsch Auditorium",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "GCTU Bookshop",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Admissions Office",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Accounts Reconciliation",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Office of the Dean of Student Affairs",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "President's Conference Room",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Accounts Receivable/ Accounts Office",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Video Conference Center",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Main Building Washrooms - Ground",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Graduate Resource Center",
+  //         description: "Description",
+  //       },
+  //     ],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     name: "Block B",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     locations: [
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Lectures Resource Center",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Academic Affairs Directorate",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Switching Lab",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Block B Washrooms - Ground",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "CPD Office",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Computer Lab",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Center for Online Learning and Teaching (COLT)",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Software Systems Unit",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Security Office",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "B1",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "B2",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Block B Washrooms - Top",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Final Year Project Room",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "B3",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "B4",
+  //         description: "Description",
+  //       }
+  //     ],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       },
+  //     ]
+  //   },
+  //   {
+  //     name: "Cafeteria",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     locations: [
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "GCTU Radio",
+  //         description: "Description",
+  //       }
+  //     ],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Engineering Block",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     locations: [
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "HOD - Computer Engineering",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "HOD - Electrical/ Electronics Engineering",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "HOD - Telecom Engineering",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Office of the Dean Faculty of Engineering",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Electronics Lab",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Energy Systems Lab",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Reprographic Center",
+  //         description: "Description",
+  //       },
+  //       {
+  //         image: "def-loc-img.jpg",
+  //         name: "Engineering Conference Center",
+  //         description: "Description",
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Hostel Block A",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Hostel Block B",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Hostel Block C",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Airport",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Graduate School",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "GCTU Great Hall",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Bush Canteen",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     name: "Football Field",
+  //     image: "def-loc-img.jpg",
+  //     description: "Description",
+  //     loctions: [],
+  //     paths: [
+  //       {
+  //         id: "",
+  //         x: [],
+  //         y: [],
+  //       }
+  //     ]
+  //   }
+  // ];
+
+  let pathArr = [
+    {
+      id: "",
+      x: [],
+      y: [],
+    },
+  ];
+
+  let tempPathObj = {
+    id: "",
+    x: [],
+    y: [],
+  };
+
+  function togglePathEditing() {
+    let pathEditingBtn = document.getElementById("path-editing-btn");
+    if (pathEditing === true) {
+      pathEditingBtn.value = "Enable Path Editing";
+      pathEditing = false;
+    } else {
+      pathEditingBtn.value = "Disable Path Editing";
+      pathEditing = true;
+    }
+  }
+
+  function toggleAllPathDrawing() {
+    if (drawAll === true) {
+      drawAll = false;
+    } else {
+      drawAll = true;
+    }
+  }
+
+  //draws path of points passed to it
+  function drawPath(arrayObj) {
+    if (arrayObj.x != undefined) {
+      for (i = 0; i < arrayObj.x.length; i++) {
+        context.beginPath();
+        context.moveTo(arrayObj.x[i], arrayObj.y[i]);
+        context.lineTo(arrayObj.x[i + 1], arrayObj.y[i + 1]);
+        context.strokeStyle = "red";
+        context.stroke();
+      }
+    }
+  }
+
+  //deletes the path with the passed ID
+  function deletePath(id) {
+    let res = confirm(`Do you want to delete Path-${id}?`);
+    if (res === false) {
+      return;
+    }
+    for (i = 0; i < pathArr.length; i++) {
+      if (pathArr[i].id == id) {
+        pathArr.splice(i, 1);
+        listPaths();
+        return;
+      }
+    }
+  }
+
+  //displays a list of created paths
+  function listPaths() {
+    let pathList = document.getElementById("path-list");
+    pathList.innerHTML = "<b>Click on a path name to delete it</b>";
+    pathArr.map((item) => {
+      pathList.innerHTML += `
+        <p onclick="deletePath('${item.id}')" class="path-item">Path-${item.id}</p>
+        `;
+    });
+  }
+
+  let drawAll = true;
+  //draws all paths of path objects passed to it
+  function drawAllPaths(pathArray) {
+    if (drawAll === false) {
+      return;
+    }
+    // pathEditing = true;
+    pathArray.map((item) => {
+      drawPath(item);
+    });
+  }
+
+  //removes points from the tempPathObj
+  function undoPath() {
+    tempPathObj.x.pop();
+    tempPathObj.y.pop();
+  }
+
+  //adds the values in the temporary path object to the main path array and resets the temporary path object
+  function addPath() {
+    pathArr.push(tempPathObj);
+    tempPathObj = {
+      id: "",
+      x: [],
+      y: [],
+    };
+    alert("Path added!");
+    listPaths();
+  }
+
+  class LocationObj {
+    constructor(image, name, description) {
+      this.image = image,
+        this.name = name,
+        this.description = description
+    }
+  }
+
+  var canvas = document.getElementById("myCanvas");
+
+  let context = canvas.getContext("2d");
+
+  context.lineWidth = 3;
+
+  var t = Date.now();
+  var timePassed = 0;
+  var dir = 0;
+
+  window.onload = drawMe();
+  checkFontA(); listLocations();
+
+  function drawMe() {
+    //calculating for frames per second
+    timePassed = (Date.now() - t) / 1000;
+    t = Date.now();
+    var fps = Math.round(1 / timePassed);
+
+    //clears the canvas for redraw
+    context.clearRect(0, 0, 650 * 2, 450 * 2);
+
+    //draws map image
+    const myMap = document.getElementById("map");
+    context.drawImage(myMap, bgX, bgY, 430, 648);
+
+    drawPath(tempPathObj);
+    drawAllPaths(pathArr);
+
+    //draws google logo
+      const googleLogo = document.getElementById("googleLogo");
+      context.drawImage(googleLogo, 10, 610, 60, 30);
+
+    //writes names of buildings
+    context.font = "13px Arial";
+    context.fillStyle = "slategray";
+    context.fillText("Main Building", 110, 140);
+    context.fillText("Engineering Block", 200, 300);
+    context.fillText("Block B", 60, 220);
+    context.fillText("Cafeteria", 50, 340);
+    context.fillText("Hostel Block A", 50, 400);
+    context.fillText("Hostel Block B", 140, 460);
+    context.fillText("Hostel Block C", 200, 430);
+    context.fillText("Airport", 240, 380);
+    context.fillText("Graduate School", 270, 360);
+    context.fillText("Football Field", 140, 580);
+    /*
+//draws destination icon at destination
+context.font = "20px FontAwesome";
+context.fillText('\uF041', endX, endY);
+*/
+    //draws rectangular background for destination text
+    context.beginPath();
+    context.rect(endX, endY, 75, 20);
+    context.fillStyle = "rgb(7, 18, 160)";
+    context.fill();
+    //writes text
+    context.font = "13px FontAwesome";
+    context.fillStyle = "white";
+    context.fillText("\uF041 Destination", endX + 2, endY + 15);
+
+    //draws users at location 🔵 ⬤
+
+    context.font = "30px Arial";
+    context.fillStyle = "rgb(30, 144, 255)";
+    context.fillText("⬤", userX, userY);
+
+    createPoints();
+    drawPath2();
+    //showPathIDs();
+
+    //draws selected location in filter menu
+    dBags();
+    dCups();
+    dClothes();
+    function dBags() {
+      if (grpArr[0] == 1) {
+        context.fillText("💼", 40, 60);
+        context.fillText("💼", 290, 100);
+      }
+    }
+
+    function dCups() {
+      if (grpArr[1] == 1) {
+        context.fillText("🥤", 130, 50);
+        context.fillText("🥤", 160, 40);
+      }
+    }
+
+    function dClothes() {
+      if (grpArr[2] == 1) {
+        context.fillText("👕", 30, 180);
+        context.fillText("👕", 98, 190);
+      }
+    }
+
+    /*
+[used to draw user's position on the map]
+checks if values are greater than or equal to minimum
+and less than or equal to maximum (Prevents user from being placed outside the map)
+*/
+    if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
+      var longUnit = (0.22408 - 0.22214) / 430;
+      var longDist = 0.22408 - Math.abs(posX);
+      userX = Math.ceil(longDist / longUnit);
+    }
+    if (posY >= 5.59458 && posY <= 5.5975) {
+      var latUnit = (5.5975 - 5.59458) / 648;
+      var latDist = 5.5975 - posY;
+      userY = Math.ceil(latDist / latUnit);
+    }
+
+    //displays path IDs
+    function showPathIDs() {
+      pathArr.map((item) => {
+        context.font = "12px Arial";
+        context.fillText(item.id, item.x[0], item.y[0]);
+      });
+    }
+
+    //used to create animation
+    window.requestAnimationFrame(drawMe);
+  }
+
+  //sets location to building containing entered location
+  function setLocation() {
+    //gets user's location
+    var location = document.getElementById("location").value;
+    if (
+      location == "Main Building" ||
+      location == "Executive Wing" ||
+      location == "Head, Human Resource" ||
+      location == "A.G Director, Works & Physical Development" ||
+      location == "Main Building Washrooms - Top" ||
+      location == "Dep. Director of Finance" ||
+      location == "Internal Audit" ||
+      location == "HR. Department" ||
+      location == "Information Technology Support Services Office" ||
+      location == "Library" ||
+      location == "Information Center" ||
+      location == "Dr. Eva Von Hirsch Auditorium" ||
+      location == "GCTU Bookshop" ||
+      location == "Admissions Office" ||
+      location == "Accounts Reconciliation" ||
+      location == "Office of the Dean of Student Affairs" ||
+      location == "President's Conference Room" ||
+      location == "Accounts Receivable/ Accounts Office" ||
+      location == "Video Conference Center" ||
+      location == "Main Building Washrooms - Ground" ||
+      location == "Graduate Resource Center"
+    ) {
+      startX = 180;
+      startY = 200;
+      (userX = startX), (userY = startY);
+    } else if (
+      location == "Block B" ||
+      location == "Lectures Resource Center" ||
+      location == "Academic Affairs Directorate" ||
+      location == "Switching Lab" ||
+      location == "Block B Washrooms - Ground" ||
+      location == "CPD Office" ||
+      location == "Computer Lab" ||
+      location == "Center for Online Learning and Teaching (COLT)" ||
+      location == "Software Systems Unit" ||
+      location == "Security Office" ||
+      location == "B1" ||
+      location == "B2" ||
+      location == "Block B Washrooms - Top" ||
+      location == "Final Year Project Room" ||
+      location == "B3" ||
+      location == "B4"
+    ) {
+      startX = 100;
+      startY = 220;
+      (userX = startX), (userY = startY);
+    } else if (location == "Cafeteria" || location == "GCTU Radio") {
+      startX = 100;
+      startY = 340;
+      (userX = startX), (userY = startY);
+    } else if (location == "Hostel Block A") {
+      startX = 120;
+      startY = 400;
+      (userX = startX), (userY = startY);
+    } else if (
+      location == "Engineering Block" ||
+      location == "HOD - Computer Engineering" ||
+      location == "HOD - Electrical/ Electronics Engineering" ||
+      location == "HOD - Telecom Engineering" ||
+      location == "Office of the Dean Faculty of Engineering" ||
+      location == "Electronics Lab" ||
+      location == "Energy Systems Lab" ||
+      location == "Reprographic Center" ||
+      location == "Engineering Conference Center"
+    ) {
+      startX = 240;
+      startY = 300;
+      (userX = startX), (userY = startY);
+    } else if (location == "Hostel Block B") {
+      startX = 200;
+      startY = 460;
+      (userX = startX), (userY = startY);
+    } else if (location == "Hostel Block C") {
+      startX = 260;
+      startY = 420;
+      (userX = startX), (userY = startY);
+    } else if (location == "Airport") {
+      startX = 260;
+      startY = 360;
+      (userX = startX), (userY = startY);
+    } else if (location == "Graduate School") {
+      startX = 280;
+      startY = 360;
+      (userX = startX), (userY = startY);
+    } else if (location == "GCTU Great Hall") {
+      startX = 80;
+      startY = 460;
+      (userX = startX), (userY = startY);
+    } else if (location == "Bush Canteen") {
+      startX = 100;
+      startY = 500;
+      (userX = startX), (userY = startY);
+    } else if (location == "Football Field") {
+      startX = 160;
+      startY = 560;
+      (userX = startX), (userY = startY);
+    } else if (location == "Get current location") {
+      (startX = userX), (startY = userY);
+      //userX = startX, userY = startY;
+    }
+    setDestination();
+  }
+
+  //sets destination to building containing entered destination
+  function setDestination() {
+    //gets user's destination
+    var destination = document.getElementById("destination").value;
+    if (
+      destination == "Main Building" ||
+      destination == "Executive Wing" ||
+      destination == "Head, Human Resource" ||
+      destination == "A.G Director, Works & Physical Development" ||
+      destination == "Main Building Washrooms - Top" ||
+      destination == "Dep. Director of Finance" ||
+      destination == "Internal Audit" ||
+      destination == "HR. Department" ||
+      destination == "Information Technology Support Services Office" ||
+      destination == "Library" ||
+      destination == "Information Center" ||
+      destination == "Dr. Eva Von Hirsch Auditorium" ||
+      destination == "GCTU Bookshop" ||
+      destination == "Admissions Office" ||
+      destination == "Accounts Reconciliation" ||
+      destination == "Office of the Dean of Student Affairs" ||
+      destination == "President's Conference Room" ||
+      destination == "Accounts Receivable/ Accounts Office" ||
+      destination == "Video Conference Center" ||
+      destination == "Main Building Washrooms - Ground" ||
+      destination == "Graduate Resource Center"
+    ) {
+      pickAltPoint();
+      findPath2(startX, startY, 180, 200);
+      (endX = 180), (endY = 200);
+    } else if (
+      destination == "Block B" ||
+      destination == "Lectures Resource Center" ||
+      destination == "Academic Affairs Directorate" ||
+      destination == "Switching Lab" ||
+      destination == "Block B Washrooms - Ground" ||
+      destination == "CPD Office" ||
+      destination == "Computer Lab" ||
+      destination == "Center for Online Learning and Teaching (COLT)" ||
+      destination == "Software Systems Unit" ||
+      destination == "Security Office" ||
+      destination == "B1" ||
+      destination == "B2" ||
+      destination == "Block B Washrooms - Top" ||
+      destination == "Final Year Project Room" ||
+      destination == "B3" ||
+      destination == "B4"
+    ) {
+      pickAltPoint();
+      findPath2(startX, startY, 100, 220);
+      (endX = 100), (endY = 220);
+    } else if (destination == "Cafeteria" || destination == "GCTU Radio") {
+      pickAltPoint();
+      findPath2(startX, startY, 100, 340);
+      (endX = 100), (endY = 340);
+    } else if (destination == "Hostel Block A") {
+      pickAltPoint();
+      findPath2(startX, startY, 120, 400);
+      (endX = 120), (endY = 400);
+    } else if (
+      destination == "Engineering Block" ||
+      destination == "HOD - Computer Engineering" ||
+      destination == "HOD - Electrical/ Electronics Engineering" ||
+      destination == "HOD - Telecom Engineering" ||
+      destination == "Office of the Dean Faculty of Engineering" ||
+      destination == "Electronics Lab" ||
+      destination == "Energy Systems Lab" ||
+      destination == "Reprographic Center" ||
+      destination == "Engineering Conference Center"
+    ) {
+      pickAltPoint();
+      findPath2(startX, startY, 240, 300);
+      (endX = 240), (endY = 300);
+    } else if (destination == "Hostel Block B") {
+      pickAltPoint();
+      findPath2(startX, startY, 200, 460);
+      (endX = 200), (endY = 460);
+    } else if (destination == "Hostel Block C") {
+      pickAltPoint();
+      findPath2(startX, startY, 260, 420);
+      (endX = 260), (endY = 420);
+    } else if (destination == "Airport") {
+      pickAltPoint();
+      findPath2(startX, startY, 260, 360);
+      (endX = 260), (endY = 360);
+    } else if (destination == "Graduate School") {
+      pickAltPoint();
+      findPath2(startX, startY, 280, 360);
+      (endX = 280), (endY = 360);
+    } else if (destination == "GCTU Great Hall") {
+      pickAltPoint();
+      findPath2(startX, startY, 80, 460);
+      (endX = 80), (endY = 460);
+    } else if (destination == "Bush Canteen") {
+      pickAltPoint();
+      findPath2(startX, startY, 100, 500);
+      (endX = 100), (endY = 500);
+    } else if (destination == "Football Field") {
+      pickAltPoint();
+      findPath2(startX, startY, 160, 560);
+      (endX = 160), (endY = 560);
+    }
+  }
+
+  /*finds a path to user's destination given current 
+location coordinates and destination coordinates*/
+  var xCoord = [],
+    yCoord = [],
+    indX = 0,
+    indY = 0;
+  function findPath2(sX, sY, eX, eY) {
+    var storedY = 0;
+    complete = 0;
+
+    var pickedCoordsX = [],
+      pickedCoordsY = [],
+      pickedInd = 0;
+
+    (xCoord = []), (yCoord = []), (indX = 0), (indY = 0);
+
+    (xCoord[0] = sX), (yCoord[0] = sY);
+    indX++, indY++;
+
+    (currX = sX), (currY = sY);
+
+    var mInd = 0,
+      match = 0,
+      coordMatch = 0;
+
+    checkExists(sX, sY);
+    //picks closest existing points if user's points does not exist in point array
+    if (match == 0) {
+      if (eY > sY) {
+        checkBottom(sY);
+      } else {
+        checkTop(sY);
+      }
+    }
+    match = 0;
+
+    function checkTop(val) {
+      for (i = val; i > 0; i--) {
+        //console.log(match+","+i);
+        if (match == 1) {
+          break;
+        } else {
+          for (x = 0; x < pointArrY.length; x++) {
+            if (pointArrY[x] == i) {
+              match = 1;
+              pickedCoordsY[pickedInd] = pointArrY[x];
+              break;
+            }
+          }
+        }
+      }
+      match = 0;
+      //console.log(val+"\n"+ pickedCoordsY+","+pickedCoordsX);
+      checkLeft(sX);
+    }
+
+    function checkLeft(val) {
+      for (i = val; i > 0; i--) {
+        //console.log(match+","+i);
+        if (match == 1) {
+          break;
+        } else {
+          for (x = 0; x < pointArrX.length; x++) {
+            if (pointArrX[x] == i) {
+              match = 1;
+              pickedCoordsX[pickedInd] = pointArrX[x];
+              break;
+            }
+          }
+        }
+      }
+      (currX = pickedCoordsX[0]), (currY = pickedCoordsY[0]);
+      console.log(val + "\n" + pickedCoordsX + "," + pickedCoordsY);
+      //checkBottom(sY);
+    }
+
+    function checkBottom(val) {
+      for (i = val; i < canvas.height; i++) {
+        //console.log(match+","+i);
+        if (match == 1) {
+          break;
+        } else {
+          for (x = 0; x < pointArrY.length; x++) {
+            if (pointArrY[x] == i) {
+              match = 1;
+              pickedCoordsY[pickedInd] = pointArrY[x];
+              break;
+            }
+          }
+        }
+      }
+      match = 0;
+      //console.log(val+"\n"+ pickedCoordsY+","+pickedCoordsX);
+      checkRight(sX);
+    }
+
+    function checkRight(val) {
+      for (i = val; i < canvas.width; i++) {
+        //console.log(match+","+i);
+        if (match == 1) {
+          break;
+        } else {
+          for (x = 0; x < pointArrX.length; x++) {
+            if (pointArrX[x] == i) {
+              match = 1;
+              pickedCoordsX[pickedInd] = pointArrX[x];
+              break;
+            }
+          }
+        }
+      }
+      (currX = pickedCoordsX[0]), (currY = pickedCoordsY[0]);
+      //console.log(val+"\n"+ pickedCoordsX+","+pickedCoordsY);
+      //checkBottom(sY);
+    }
+
+    //checks if the given point exists in the point arrays
+    function checkExists(xVal, yVal) {
+      for (i = 0; i < pointArrX.length; i++) {
+        if (pointArrX[i] == xVal && pointArrY[i] == yVal) {
+          mInd = i;
+          match = 1;
+          break;
+        }
+      }
+      //console.log(pointArrX[mInd]+", "+pointArrY[mInd]);
+    }
+
+    //checks is close points for x and y were found which will be used as starting points to draw path/route
+    if (pickedCoordsX.length != pickedCoordsY.length) {
+      alert(
+        "An error was encountered in creating route. Please try again or pick another close point."
+      );
+      (startX = 20), (startY = 20), (userX = startX), (userY = startY);
+    } else {
+      checkArr();
+    }
+    //goes through the points to find the ones which are closer to current coordinate
+    function checkArr() {
+      (pickedCoordsX = []), (pickedCoordsY = []), (pickedInd = 0);
+      topLeft();
+      function topLeft() {
+        var mX = currX - 20,
+          mY = currY - 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        top();
+      }
+      function top() {
+        var mX = currX,
+          mY = currY - 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        topRight();
+      }
+      function topRight() {
+        var mX = currX + 20,
+          mY = currY - 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        left();
+      }
+      function left() {
+        var mX = currX - 20,
+          mY = currY;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        right();
+      }
+      function right() {
+        var mX = currX + 20,
+          mY = currY;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        bottomLeft();
+      }
+      function bottomLeft() {
+        var mX = currX - 20,
+          mY = currY + 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        bottom();
+      }
+      function bottom() {
+        var mX = currX,
+          mY = currY + 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+        bottomRight();
+      }
+      function bottomRight() {
+        var mX = currX + 20,
+          mY = currY + 20;
+        checkExists(mX, mY);
+        if (match == 1) {
+          (pickedCoordsX[pickedInd] = mX), (pickedCoordsY[pickedInd] = mY);
+          pickedInd++;
+          match = 0;
+        }
+      }
+      //console.log(pickedCoordsX+"\n"+pickedCoordsY);
+
+      checkDest();
+    }
+
+    //goes over the selected points and picks the one which is closer to the user's destination
+    function checkDest() {
+      var smallVal = 0,
+        sInd = 0,
+        starting = 0;
+      for (i = 0; i < pickedCoordsX.length; i++) {
+        var distX = Math.abs(pickedCoordsX[i] - eX);
+        var distY = Math.abs(pickedCoordsY[i] - eY);
+        var sum = distX + distY;
+        compare(sum, i);
+      }
+      function compare(val, iVal) {
+        if (starting == 0) {
+          smallVal = val;
+          sInd = iVal;
+          starting = 1;
+        } else if (val < smallVal) {
+          smallVal = val;
+          sInd = iVal;
+        }
+      }
+
+      //stores the selected node and sets it as the current coordinate
+      xCoord[indX] = pickedCoordsX[sInd];
+      indX++;
+      yCoord[indY] = pickedCoordsY[sInd];
+      indY++;
+      currX = pickedCoordsX[sInd];
+      currY = pickedCoordsY[sInd];
+      checkArrived();
+    }
+    //checks if the formed path has reached the user's destination
+    function checkArrived() {
+      if (currX == eX && currY == eY) {
+        shiftPoints();
+        drawPath2();
+      } else {
+        checkArr();
+      }
+    }
+  }
+  //draws the formed path
+  function drawPath2() {
+    //console.log(xCoord+"\n"+yCoord);
+    if (xCoord != undefined) {
+      for (i = 0; i < xCoord.length; i++) {
+        context.beginPath();
+        context.moveTo(xCoord[i], yCoord[i]);
+        context.lineTo(xCoord[i + 1], yCoord[i + 1]);
+        context.strokeStyle = "red";
+        context.stroke();
+      }
+    }
+  }
+
+  //creates points on canvas to be used to draw paths
+  function createPoints() {
+    if (pointsCreated == false) {
+      var yVal = 0;
+      for (y = 0; y < canvas.height; y += 20) {
+        yVal = y;
+        dRow();
+      }
+      pointsCreated = true;
+    }
+    //specifies areas where points should not be created
+    function dRow() {
+      for (x = 0; x < canvas.width; x += 20) {
+        //Main building
+        if (
+          (x >= 140 && x <= 160 && y == 120) ||
+          (x >= 120 && x <= 160 && y == 140) ||
+          (x >= 120 && x <= 180 && y == 160) ||
+          (x >= 160 && x <= 180 && y == 180) ||
+          (x == 160 && y == 200) ||
+          //B block
+          (x == 60 && y == 180) ||
+          (x == 60 && y == 200) ||
+          (x == 60 && y == 200) ||
+          (x == 80 &&
+            y == 200) /*|| x == 80 && y == 220 || x == 80 && y == 240*/ ||
+          (x == 100 &&
+            y == 240) /*|| x == 100 && y == 260 || x == 100 && y == 280*/ ||
+          //Cafeteria
+          (x == 60 /*&& x <= 100*/ && y == 320) ||
+            /* x >= 60 &&*/ (x == 80 && y == 340) /*|| x == 60 && y == 360*/ ||
+          //Hostel block A
+          (x >= 80 && x <= 100 && y == 400) ||
+          (x >= 100 && x <= 110 && y == 420) ||
+            //Hostel block B
+            /*x == 160 && y == 440 ||*/ (x >= 160 && x <= 180 && y == 460) ||
+          (x >= 180 && x <= 200 && y == 480) ||
+          //Hostel block C
+          (x >= 220 && x <= 240 && y == 420) ||
+          (x >= 240 && x <= 260 && y == 440) ||
+          //Engineering Block
+          (x == 200 && y == 300) ||
+          (x >= 200 && x <= 220 && y == 320) ||
+          (x == 220 && y == 340) ||
+          (x >= 260 && x <= 280 && y == 280) ||
+          (x == 200 && y >= 300 && y <= 320) ||
+          //Air port
+          (x == 260 && y == 380) ||
+          (x == 260 && y == 400) ||
+          (x == 280 && y == 400) ||
+          //Graduate school block
+          (x >= 300 && x <= 340 && y == 340) ||
+          (x >= 320 && x <= 340 && y == 360) ||
+          (x == 300 && y == 380) ||
+          (x == 320 && y == 400) ||
+          //GCTU Great Hall
+          (x >= 40 && x <= 60 && y == 460) ||
+          //Bush canteen
+          (x == 80 && y == 500) ||
+          (x >= 80 && x <= 100 && y == 520)
+        ) {
+          //adds points to building point array
+          //bdPointArrX.push(x), bdPointArrY.push(yVal);
+          //adds points to regular point array
+          //pointArrX.push(x), pointArrY.push(yVal);
+        } else {
+          //stores created points
+          //context.fillText("•", x, yVal);
+          pointArrX.push(x), pointArrY.push(yVal);
+        }
+      }
+    }
+    //draws points
+    for (i = 0; i < pointArrX.length; i++) {
+      //context.fillText("•", pointArrX[i], pointArrY[i]);
+    }
+    //building points
+    for (i = 0; i < bdPointArrX.length; i++) {
+      context.fillStyle = "red";
+      context.fillText("•", bdPointArrX[i], bdPointArrY[i]);
+    }
+  }
+
+  /*picks alternate point/closest point if user's current position is within a building
+or far from paths*/
+  function pickAltPoint() {
+    //Main building
+    if (
+      (x >= 140 && x <= 180 && y == 120) ||
+      (x >= 100 && x <= 180 && y == 140) ||
+      (x >= 120 && x <= 200 && y == 160) ||
+      (x >= 160 && x <= 200 && y == 180) ||
+      (x >= 140 && x <= 180 && y == 200)
+    ) {
+      (startX = 140), (startY = 180);
+    }
+    /*
+//bed 1 and wardrobe 1
+else if(startX >= 2 && startX <= 58 && startY >= 25 && startY <= 230){
+startX = 60, startY = 140;
+}
+//bed 2
+else if(startX >= 282 && startX <= 330 && startY >= 22 && startY <= 135){
+startX = 280, startY = 80;
+}
+
+//bathroom and wardrobe 2
+else if(startX >= 100 && startX <= 350 && startY >= 150){
+startX = 160, startY = 140;
+}
+*/
+  }
+
+  /*goes through selected points and shifts points which pass through
+buildings to alternate points*/
+  function shiftPoints() {
+    var destination = document.getElementById("destination").value;
+
+    for (i = 0; i < xCoord.length; i++) {
+      //check main building
+      if (xCoord[i] == 140 && yCoord[i] == 200) {
+        (xCoord[i] = 140), (yCoord[i] = 220);
+      }
+      //block B
+      if (xCoord[i] == 80 && yCoord[i] == 240 && destination == "Block B") {
+        //xCoord[i] = 120, yCoord[i] = 300;
+        (xCoord[i] = 140), (yCoord[i] = 280);
+      }
+      if (
+        xCoord[i] == 60 &&
+        yCoord[i] == 220 &&
+        xCoord[i + 1] == 80 &&
+        yCoord[i + 1] == 220 &&
+        destination == "Block B"
+      ) {
+        (xCoord[i] = 40), (yCoord[i] = 160);
+        (xCoord[i + 1] = 80), (yCoord[i + 1] = 160);
+      }
+      if (
+        xCoord[i] == 80 &&
+        yCoord[i] == 220 &&
+        xCoord[i + 1] == 100 &&
+        yCoord[i + 1] == 220 &&
+        destination == "Block B"
+      ) {
+        (xCoord[i] = 120), (yCoord[i] = 300);
+      }
+      if (
+        xCoord[i] == 80 &&
+        yCoord[i] == 220 &&
+        xCoord[i + 1] == 100 &&
+        yCoord[i + 1] == 200 &&
+        xCoord[i + 2] == 120 &&
+        yCoord[i + 2] == 200 &&
+        xCoord[i + 3] == 140 &&
+        yCoord[i + 3] == 200
+      ) {
+        (xCoord[i] = 120), (yCoord[i] = 300);
+        (xCoord[i + 1] = 140), (yCoord[i + 1] = 260);
+        (xCoord[i + 2] = 160), (yCoord[i + 2] = 260);
+        (xCoord[i + 3] = 160), (yCoord[i + 3] = 240);
+      }
+      if (
+        xCoord[i] == 80 &&
+        yCoord[i] == 240 &&
+        xCoord[i + 1] == 100 &&
+        yCoord[i + 1] == 220 &&
+        xCoord[i + 2] == 120 &&
+        yCoord[i + 2] == 200 &&
+        xCoord[i + 3] == 140 &&
+        yCoord[i + 3] == 200
+      ) {
+        (xCoord[i] = 120), (yCoord[i] = 280);
+        (xCoord[i + 1] = 140), (yCoord[i + 1] = 260);
+        (xCoord[i + 2] = 160), (yCoord[i + 2] = 260);
+        (xCoord[i + 3] = 160), (yCoord[i + 3] = 240);
+      }
+      if (xCoord[i] == 100 && yCoord[i] == 280) {
+        (xCoord[i] = 100), (yCoord[i] = 300);
+      }
+      if (xCoord[i] == 100 && yCoord[i] == 260) {
+        (xCoord[i] = 120), (yCoord[i] = 280);
+      }
+      //from north-east to cafeteria
+      if (
+        xCoord[i] == 100 &&
+        yCoord[i] == 220 &&
+        xCoord[i + 1] == 80 &&
+        yCoord[i + 1] == 240 &&
+        xCoord[i + 2] == 100 &&
+        yCoord[i + 2] == 260
+      ) {
+        (xCoord[i + 1] = 110), (yCoord[i + 1] = 240);
+        (xCoord[i + 2] = 120), (yCoord[i + 2] = 260);
+      }
+      //from north-west to cafeteria
+      if (
+        xCoord[i] == 80 &&
+        yCoord[i] == 220 &&
+        xCoord[i + 1] == 100 &&
+        yCoord[i + 1] == 220 &&
+        xCoord[i + 2] == 80 &&
+        yCoord[i + 2] == 240 &&
+        xCoord[i + 3] == 100 &&
+        yCoord[i + 3] == 260
+      ) {
+        (xCoord[i] = 60), (yCoord[i] = 220);
+        (xCoord[i + 1] = 60), (yCoord[i + 1] = 240);
+        (xCoord[i + 2] = 60), (yCoord[i + 2] = 260);
+        (xCoord[i + 3] = 80), (yCoord[i + 3] = 280);
+      }
+      //Hostel Block A
+      if (xCoord[i] == 120 && yCoord[i] == 420) {
+        (xCoord[i] = 150), (yCoord[i] = 409);
+      }
+      //Hostel block b
+      if (xCoord[i] == 160 && yCoord[i] == 440) {
+        (xCoord[i] = 160), (yCoord[i] = 420);
+      }
+      //cafeteria
+      if (
+        xCoord[i] == 80 &&
+        yCoord[i] == 320 &&
+        destination == "GCTU Great Hall"
+      ) {
+        (xCoord[i] = 60), (yCoord[i] = 300);
+      }
+      if (
+        xCoord[i] == 60 &&
+        yCoord[i] == 340 &&
+        destination == "GCTU Great Hall"
+      ) {
+        (xCoord[i] = 20), (yCoord[i] = 340);
+      }
+    }
+  }
+
+  //location code
+  const status = document.getElementById("status");
+
+  const posLog = document.getElementById("posLog");
+
+  function getPos() {
+    function success(position) {
+      posY = position.coords.latitude;
+      posX = position.coords.longitude;
+      //checks accuracy of values
+      var accu = position.coords.accuracy;
+
+      accuracyNote.innerHTML = `Accuracy: ${accu.toFixed(2)}`;
+
+      /* 
+posLog.innerHTML += "Latitude: "+posY+"°, Longitude: "+posX+"°"+"<br>";
+posLog.innerHTML += "user x: " + userX + ", user y: " + userY + "<hr>";
+*/
+      status.textContent = "";
+    }
+
+    function error() {
+      status.textContent = "Unable to retrieve your location";
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      maximumAge: 30000,
+      timeout: 27000,
+    };
+
+    if (!navigator.geolocation) {
+      status.textContent = "Geolocation is not supported by your browser";
+    } else {
+      status.textContent = "Locating…";
+
+      const watchID = navigator.geolocation.watchPosition(
+        success,
+        error,
+        options
+      );
+    }
+  }
+
+  //checks if location menu is open
+  var locMenuOpen = false;
+  //hides all location menus
+  function hideLocMenu() {
+    var locMenu = document.getElementsByClassName("locMenu");
+    for (i = 0; i < locMenu.length; i++) {
+      locMenu[i].style.display = "none";
+    }
+    locMenuOpen = false;
+  }
+
+  //shows location menus
+  function showLocMenu(x, y) {
+    hideSideMenu();
+    hideLocMenu();
+
+    locMenuOpen = true;
+    //Main building
+    if (x >= 99 && x <= 183 && y >= 113 && y <= 147) {
+      const mainBuilding = document.getElementById("mainBuilding");
+      mainBuilding.style.display = "block";
+    }
+    //Block B
+    else if (x >= 51 && x <= 104 && y >= 213 && y <= 233) {
+      const blockB = document.getElementById("blockB");
+      blockB.style.display = "block";
+    }
+    //Cafeteria
+    else if (x >= 46 && x <= 103 && y >= 333 && y <= 353) {
+      const cafeteria = document.getElementById("cafeteria");
+      cafeteria.style.display = "block";
+    }
+    //Hostel block A
+    else if (x >= 45 && x <= 135 && y >= 392 && y <= 410) {
+      const hostelBlockA = document.getElementById("hostelBlockA");
+      hostelBlockA.style.display = "block";
+    }
+    //Hostel bock B
+    else if (x >= 136 && x <= 220 && y >= 453 && y <= 470) {
+      const hostelBlockB = document.getElementById("hostelBlockB");
+      hostelBlockB.style.display = "block";
+    }
+    //Hostel block C
+    else if (x >= 190 && x <= 280 && y >= 419 && y <= 441) {
+      const hostelBlockC = document.getElementById("hostelBlockC");
+      hostelBlockC.style.display = "block";
+    }
+    //Engineering block
+    else if (x >= 190 && x <= 304 && y >= 296 && y <= 311) {
+      const engineeringBlock = document.getElementById("engineeringBlock");
+      engineeringBlock.style.display = "block";
+    }
+    //Graduate school
+    else if (x >= 264 && x <= 364 && y >= 352 && y <= 373) {
+      const graduateSchool = document.getElementById("graduateSchool");
+      graduateSchool.style.display = "block";
+    }
+    //Airport
+    else if (x >= 231 && x <= 277 && y >= 373 && y <= 393) {
+      const airport = document.getElementById("airport");
+      airport.style.display = "block";
+    }
+    //GCTU Great Hall
+    else if (x >= 7 && x <= 102 && y >= 454 && y <= 474) {
+      const gctuGreatHall = document.getElementById("gctuGreatHall");
+      gctuGreatHall.style.display = "block";
+    }
+    //Bush canteen
+    else if (x >= 48 && x <= 120 && y >= 494 && y <= 520) {
+      const bushCanteen = document.getElementById("bushCanteen");
+      bushCanteen.style.display = "block";
+    }
+    //Football field
+    else if (x >= 129 && x <= 221 && y >= 570 && y <= 592) {
+      const footballField = document.getElementById("footballField");
+      footballField.style.display = "block";
+    }
+    //emergency contacts
+    else if (x == 0 && y == 0) {
+      const emergencyMenu = document.getElementById("emergencyMenu");
+      emergencyMenu.style.display = "block";
+    }
+    //shows destination details window
+    else if (x >= endX && x <= endX + 110 && y >= endY && y <= endY + 20) {
+      alert("Destination details");
+    }
+  }
+
+
+  let currentLocationIndex = null;
+  function showLocMenu2(x, y) {
+    for (i = 0; i < buildingDataArray.length; i++) {
+      if (x >= buildingDataArray[i].nameCoords.x1 && x <= buildingDataArray[i].nameCoords.x2 && y >= buildingDataArray[i].nameCoords.y1 && y <= buildingDataArray[i].nameCoords.y2) {
+        let mainBuilding = document.getElementById("mainBuilding");
+        mainBuilding.style.display = "block";
+        mainBuilding.innerHTML = `
+        <span class="buildName"><span class="closeBtn" onclick="hideLocMenu();">&times</span> ${buildingDataArray[i].name}</span><br /><br /><br />
+    <center>
+      <img class="buildImg" src="img/${buildingDataArray[i].image}" />
+    </center>
+    <p class="locDesc">
+      ${buildingDataArray[i].description}
+    </p>
+    <hr />
+        `;
+        //--
+        buildingDataArray[i].locations.map((item) => {
+          mainBuilding.innerHTML += `
+      <div class="loc">
+      <b class="locName">${item.name}</b>
+      <img src="img/${item.image}" class="locDetail" />
+      <div class="locDetail">
+        <p class="locDesc">${item.description}</p>
+      </div>
+    </div>
+      `;
+        });
+        break;
+      }
+    }
+    //shows the details of the destination using the currentLocationIndex value
+    if (x >= endX && x <= endX + 110 && y >= endY && y <= endY + 20) {
+        showLocDetail(currentLocationIndex);
+      }
+
+  }
+
+
+
+  //highligts the name of a chosen location
+  function highlight(val) {
+    if (locMenuOpen == true) {
+      const locName = document.getElementsByClassName("locName");
+      for (i = 0; i < locName.length; i++) {
+        locName[i].style.animationName = "";
+        if (locName[i].innerHTML == val) {
+          locName[i].scrollIntoView({ block: "center" });
+          locName[i].style.animationName = "highlightAnim";
+          locName[i].style.animationDuration = 3 + "s";
+          locName[i].style.animationIterationCount = 4;
+          break;
+        }
+      }
+    }
+  }
+
+  /*checks if user has chosen to choose location on map and sets their location to 
+the point they click on the map*/
+  function getMousePosition(canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    x = event.clientX - rect.left;
+    y = event.clientY - rect.top;
+    const location = document.getElementById("location").value;
+    if (location == "Choose on map") {
+      (userX = x.toFixed(0)), (userY = y.toFixed(0));
+      (startX = userX), (startY = userY);
+      //setDestination();
+    } else if (pathEditing === true) {
+      //adds points to the tempPathObj
+      tempPathObj.id = generateID();
+      tempPathObj.x.push(x);
+      tempPathObj.y.push(y);
+    } else {
+      showLocMenu2(x, y);
+    }
+    //posLog.innerHTML = "x: " + x + " | y: " + y;
+  }
+
+  //shows selection area
+  function showSelectionArea() {
+    selectionArea.style.display = "block";
+    searchArea.style.display = "none";
+  }
+  //hides selection area
+  function hideSelectionArea() {
+    var location = document.getElementById("location");
+    var destination = document.getElementById("destination");
+    location.value = `${userX}, ${userY}`;
+    selectionArea.style.display = "none";
+    searchArea.style.display = "block";
+    destination.focus();
+  }
+
+  canvas.addEventListener("mousedown", function (e) {
+    getMousePosition(canvas, e);
+  });
+
+  //generates random numbers to be used as path IDs
+  function generateID() {
+    let id = `${Math.ceil(Math.random() * 1000)}-${Math.ceil(
+      Math.random() * 1000
+    )}`;
+    return id;
+  }
+
+  /*
+canvas.addEventListener("touchstart", function(e){
+getMousePosition(canvas, e);
+holding = true;
+checkHold(canvas, e);
+});
+*/
+  /*
+canvas.addEventListener("mouseup", function(e){
+holding = false;
+clr = clearTimeout(set);
+});
+*/
+  /*
+canvas.addEventListener("touchmove", function(e){
+holding = false;
+clr = clearTimeout(set);
+});
+*/
+
+  //shows the details of the location with the passed location index
+  function showLocDetail(locIndex) {
+    hideSideMenu();
+    let locInfoContainer = document.getElementById("loc-info-container");
+    locInfoContainer.style.display = "";
+    let locArray = sortLocationsAlphabetically();
+    let locObj = locArray[locIndex];
+    let buildingName = buildingDataArray[locObj.buildingIndex].name;
+    locInfoContainer.innerHTML = `
+  <div class="loc">
+      <b id="loc-name-container"><span class="closeBtn" onclick="hideMenu('loc-info-container');">&times</span> ${locObj.name}</b>
+      <img src="img/${locObj.image}" class="locDetail" />
+      <div class="locDetail">
+        <p class="locDesc">
+          Location: <b>${buildingName}</b>
+        </p>
+        <p class="locDesc">${locObj.description}</p>
+      </div>
+    </div>
+  `;
+  }
+
+  //lists all existing locations in the location menu
+  function listLocations() {
+    let locMenuCon = document.getElementById("locMenuCon");
+    locMenuCon.innerHTML = "";
+    let locArray = sortLocationsAlphabetically();
+    locArray.map((item, index) => {
+      locMenuCon.innerHTML += `
+    <li onclick="showLocDetail(${index});" class="sideMenuOpt">
+            ${item.name}
+          </li>
+    `;
+    })
+  }
+
+  //sets the use's location coordinates to the coordinates of the building which contains the selected location 
+  function setLocation2(buildingIndex){
+    userX = buildingDataArray[buildingIndex].position.x;
+    userY = buildingDataArray[buildingIndex].position.y;
+  }
+
+  //sets the use's destination coordinates to the coordinates of the building which contains the selected location 
+  function setDestination2(buildingIndex, locationIndex){
+    endX = buildingDataArray[buildingIndex].position.x;
+    endY = buildingDataArray[buildingIndex].position.y;
+    setDestination();
+    //showDestinationPaths(buildingIndex);
+    currentLocationIndex = locationIndex;
+  }
+
+  //shows all paths which leads to the building where the chosen location can be found
+  function showDestinationPaths(buildingIndex){
+    pathArr = buildingDataArray[buildingIndex].paths;
+    drawAll = true;
+  }
+
+  //clears paths drawn on canvas
+  function clearPaths(){
+    drawAll = false;
+    endX = -50;
+    endY = -50;
+    hideSideMenu();
+  }
+
+  //checks if a location or destination is clicked and sets the appropriate field to the clicked value
+  window.onclick = (e) => {
+    if (e.target.className == "locResult") {
+      const location = document.getElementById("location");
+      location.value = e.target.innerHTML;
+      searchResults.innerHTML = "";
+    } else if (e.target.className == "desResult") {
+      const destination = document.getElementById("destination");
+      destination.value = e.target.innerHTML;
+      searchResults.innerHTML = "";
+    } else if (e.target.className == "altOpt") {
+      const location = document.getElementById("location");
+      location.value = e.target.innerHTML;
+      searchResults.innerHTML = "";
+    }
+    highlight(e.target.innerHTML);
+  };
+
+  function hideMenu(id) {
+    let container = document.getElementById(id).style.display = "none";
+  }
+
+
+</script>
+
+</html>

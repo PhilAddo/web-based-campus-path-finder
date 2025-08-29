@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Admin Dashboard</title>
+  </head>
+  <body>
+    <div id="head-container">
+      <b></b>
+      <h2>Web-Based Campus Path Finder</h2>
+      <b style="cursor: pointer;" onclick="logOut();">Log Out</b>
+    </div>
+    <div id="main-container">
+      <div class="section-container">
+        <h3>Welcome Admin</h3>
+        <p>What would you like to do?</p>
+        <input
+          type="button"
+          class="large-btn"
+          value="Add/ Edit a Location"
+          onclick="goToPage('edit-locations.html');"
+        /><br /><br />
+        <!-- <input
+          type="button"
+          class="large-btn"
+          value="Add/ Edit Paths"
+          onclick="goToPage('edit-paths.html');"
+        /> -->
+      </div>
+    </div>
+  </body>
+  <script>
+    //checks if an admin is logged in by checking the activeUser value in sessionStorage
+    let activeUser = sessionStorage.getItem("activeUser");
+    if(activeUser !== "admin") {
+      window.location.href = "admin-login-page.html";
+    }
+
+    //switches to the page with the passed name
+function goToPage(pageName) {
+  window.location.href = pageName;
+}
+
+//logs out an admin
+function logOut(){
+  sessionStorage.removeItem("activeUser");
+  window.location.href = "admin-login-page.html";
+}
+
+  </script>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="main.js"></script>
+    <title>Admin Log In</title>
+  </head>
+
+  <body>
+    <div id="head-container">
+      <b></b>
+      <h2>Web-Based Campus Path Finder</h2>
+      <b></b>
+    </div>
+    <center>
+      <div id="cred-body-container">
+        <div id="blur-element"></div>
+        <div class="cred-container" id="login-container">
+          <h3>Admin Log In</h3>
+          <form class="form-container" id="login-form" onsubmit="logIn(event);">
+            <input
+              type="text"
+              class="text-input"
+              placeholder="Admin ID"
+              required
+            /><br />
+            <input
+              type="password"
+              class="text-input"
+              placeholder="Password"
+              required
+            /><br />
+            <input type="submit" value="LOG IN" class="btn" />
+          </form>
+        </div>
+      </div>
+    </center>
+  </body>
+  <script>
+    let currentContainer = "registeration-container";
+
+    window.onload = () => {
+      sessionStorage.removeItem("activeUser");
+    };
+  </script>
+</html>
