@@ -1,27 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Web-Based Campus Path Finder</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="style2.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <meta name="viewport" content="width=device-width, initial scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <title>Web-Based Campus Path Finder</title>
+  <link rel="stylesheet" href="style2.css" />
+  <script src="main.js"></script>
 </head>
+
 <body>
-  <header>
-    <div style="font-size: 20px;">
-      <span id="openSideMenuBtn"><i class="fa fa-bars" aria-hidden="true" onclick="showSideMenu();"></i><span
+  <!--heading section-->
+  <div id="heading">
+    <table id="titleBar">
+      <tr>
+        <td style="width: 20%; cursor: default">
+          <span id="openSideMenuBtn"><i class="fa fa-bars" aria-hidden="true" onclick="showSideMenu();"></i><span
               class="altTxt" onclick="showSideMenu();">menu</span></span><span id="closeSideMenuBtn"
             onclick="hideSideMenu();">&times</span>
-    </div>
-    <h2>Web-Based Campus Path Finder</h2>
-    <div></div>
-  </header>
+        </td>
+        <td style="width: 60%"><b>Web-Based Campus Path Finder</b></td>
+        <td style="width: 20%; cursor: default">
+          <i class="fa fa-search" aria-hidden="true" onclick="showSearch();"></i><span class="altTxt"
+            onclick="showSearch();">search</span>
+        </td>
+      </tr>
+    </table>
 
-<!--side menu-->
+    <!--search box and options-->
+    <div id="searchArea">
+      <input type="search" id="location" placeholder="Enter location" class="searchField" oninput="searchLoc();"
+        onclick="showAltOptions();" onblur="hideAltOptions();" /><br />
+      <input type="search" id="destination" placeholder="Enter Destination" class="searchField" oninput="searchDes();"
+        onblur="hideAltOptions();" /><br />
+      <div id="searchResults"></div>
+      <div id="altOptions">
+        <b class="altOpt" onclick="getPos();">Get current location</b>
+        <b class="altOpt" onclick="showSelectionArea();">Choose on map</b>
+      </div>
+      <div id="returnIcon" style="cursor: default" onclick="showTitle();">
+        <i class="fa fa-angle-up" aria-hidden="true"></i><span class="altTxt"
+          style="color: white; background-color: rgb(7, 18, 160); padding: 3px">hide</span>
+      </div>
+    </div>
+
+    <!--selection area-->
+    <div id="selectionArea">
+      <span>Click on a point on the map to set as your location and click on the
+        button below to proceed.</span><br />
+      <center>
+        <input type="button" value="Use point" id="usePointBtn" onclick="hideSelectionArea();" />
+      </center>
+    </div>
+
+    <!--side menu-->
     <div id="sideMenu">
+      <div class="sideMenuOpt" onclick="clearPaths();">
+          Clear Paths
+        </div>
       <!--locations menu-->
       <details>
         <summary class="sideMenuOpt">Locations</summary>
@@ -36,37 +72,21 @@
     </div>
   </div>
 
-  <div id="map-elements">
-    <div id="accessibility-tools">
-    <button onclick="toggleContrast()">High Contrast</button>
-    <button onclick="increaseTextSize()">A+</button>
-  </div>
+  <!--map canvas-->
+  <center>
+    <div id="myCanvasCon">
+      <canvas id="myCanvas" width="430" height="648">
+        Your browser does not support the HTML 5 canvas tag
+      </canvas>
+    </div>
+  </center>
 
-  <div id="search-container">
-    <input type="text" id="searchInput" placeholder="Search location..." oninput="searchLoc();checkSearchInput();">
-    <button onclick="searchLoc()">Search</button>
-    <div id="searchResults"></div>
-  </div>
-
-  <div id="route-controls">
-  <button onclick="setRouteMode('start')">Set Start Point</button>
-  <button onclick="setRouteMode('end')">Set End Point</button>
-  <button onclick="drawRoute()">Draw Route</button>
-  <button onclick="clearRoute()">Clear Route</button>
-  <button onClick="getUser()">Get Location</button>
-</div>
-<div id="map"></div>
-
-</div>
-  
-
-<!--main building location contents-->
+  <!--main building location contents-->
   <div class="locMenu" id="mainBuilding">
   </div>
 
 
-
-<!--Emergency contacts menu-->
+  <!--Emergency contacts menu-->
   <div class="locMenu" id="emergencyMenu">
     <span class="buildName"><span class="closeBtn" onclick="hideLocMenu();">&times</span> Emergency
       Menu</span><br /><br /><br />
@@ -166,8 +186,12 @@
     </div>
   </div>
 
+  <!--get position button element-->
+  <center>
+    <input type="button" value="⦿ Get position" onclick="getPos();" id="getPosBtn" /><br />
+  </center>
 
-<div id="loc-info-container" style="display: none;">
+  <div id="loc-info-container" style="display: none;">
     <div class="loc">
       <b id="loc-name-container"><span class="closeBtn" onclick="hideMenu('loc-info-container');">&times</span> Location
         Name</b>
@@ -182,11 +206,24 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+
+
+  <i id="status"></i><br /><br />
+  <i id="accuracyNote"></i><br /><br />
+
+  <div id="posLog"></div>
+  <br />
+
+  <!--map image tag-->
+  <img id="map" src="img/gt_map.png" width="100%" height="250" style="display: none" />
+  <img src="img/google_logo.png" id="googleLogo" style="display: none" />
+
+  <!--
+<iframe src="https://www.google.com/maps/d/u/0/embed?mid=1mfyOF-sjU8K_CdmaUe4gCL2WAOSfhuEq&ehbc=2E312F" width="640" height="480"></iframe>
+-->
 </body>
-<script>
-    //sets the default value of the active user value in session storage
+<script text="text/JavaScript">
+  //sets the default value of the active user value in session storage
   sessionStorage.setItem("activeUser", "user");
 
   var posX = 0,
@@ -225,7 +262,6 @@
   const selectionArea = document.getElementById("selectionArea");
   const openSideMenuBtn = document.getElementById("openSideMenuBtn");
   const closeSideMenuBtn = document.getElementById("closeSideMenuBtn");
-  const mapElements = document.getElementById("map-elements");
 
   //shows title bar and hides search area
   function showTitle() {
@@ -242,14 +278,12 @@
     sideMenu.style.display = "block";
     openSideMenuBtn.style.display = "none";
     closeSideMenuBtn.style.display = "block";
-    mapElements.style.display = "none";
   }
   //hides side menu
   function hideSideMenu() {
     sideMenu.style.display = "none";
     openSideMenuBtn.style.display = "block";
     closeSideMenuBtn.style.display = "none";
-    mapElements.style.display = "block";
   }
 
   //stores values of groups
@@ -335,7 +369,7 @@
   //searches location array to set user's location
   function searchLoc() {
     var location = document
-      .getElementById("searchInput")
+      .getElementById("location")
       .value.toUpperCase()
       .trim();
 
@@ -355,14 +389,14 @@
         searchResults.innerHTML += `
         <b class='locResult' onclick='setLocation2(${locArray[x].buildingIndex})'>${locArray[x].name}</b>
         `;
-        // altOptions.style.display = "none";
+        altOptions.style.display = "none";
       }
     }
 
     if (searchResults.innerHTML == "" && location != "") {
       searchResults.innerHTML = `<i id="notFound">Sorry no results for "${location}" was found</i>`;
     } else if (location == "") {
-      // altOptions.style.display = "block";
+      altOptions.style.display = "block";
     }
     //setLocation();
   }
@@ -929,129 +963,129 @@
     }
   }
 
-  window.onload = checkFontA(); listLocations();
+  var canvas = document.getElementById("myCanvas");
 
-//   var canvas = document.getElementById("myCanvas");
+  let context = canvas.getContext("2d");
 
-//   let context = canvas.getContext("2d");
+  context.lineWidth = 3;
 
-//   context.lineWidth = 3;
+  var t = Date.now();
+  var timePassed = 0;
+  var dir = 0;
 
-//   var t = Date.now();
-//   var timePassed = 0;
-//   var dir = 0;
+  window.onload = drawMe();
+  checkFontA(); listLocations();
 
+  function drawMe() {
+    //calculating for frames per second
+    timePassed = (Date.now() - t) / 1000;
+    t = Date.now();
+    var fps = Math.round(1 / timePassed);
 
-//   function drawMe() {
-//     //calculating for frames per second
-//     timePassed = (Date.now() - t) / 1000;
-//     t = Date.now();
-//     var fps = Math.round(1 / timePassed);
+    //clears the canvas for redraw
+    context.clearRect(0, 0, 650 * 2, 450 * 2);
 
-//     //clears the canvas for redraw
-//     context.clearRect(0, 0, 650 * 2, 450 * 2);
+    //draws map image
+    const myMap = document.getElementById("map");
+    context.drawImage(myMap, bgX, bgY, 430, 648);
 
-//     //draws map image
-//     const myMap = document.getElementById("map");
-//     context.drawImage(myMap, bgX, bgY, 430, 648);
+    drawPath(tempPathObj);
+    drawAllPaths(pathArr);
 
-//     drawPath(tempPathObj);
-//     drawAllPaths(pathArr);
+    //draws google logo
+      const googleLogo = document.getElementById("googleLogo");
+      context.drawImage(googleLogo, 10, 610, 60, 30);
 
-//     //draws google logo
-//       const googleLogo = document.getElementById("googleLogo");
-//       context.drawImage(googleLogo, 10, 610, 60, 30);
+    //writes names of buildings
+    context.font = "13px Arial";
+    context.fillStyle = "slategray";
+    context.fillText("Main Building", 110, 140);
+    context.fillText("Engineering Block", 200, 300);
+    context.fillText("Block B", 60, 220);
+    context.fillText("Cafeteria", 50, 340);
+    context.fillText("Hostel Block A", 50, 400);
+    context.fillText("Hostel Block B", 140, 460);
+    context.fillText("Hostel Block C", 200, 430);
+    context.fillText("Airport", 240, 380);
+    context.fillText("Graduate School", 270, 360);
+    context.fillText("Football Field", 140, 580);
+    /*
+//draws destination icon at destination
+context.font = "20px FontAwesome";
+context.fillText('\uF041', endX, endY);
+*/
+    //draws rectangular background for destination text
+    context.beginPath();
+    context.rect(endX, endY, 75, 20);
+    context.fillStyle = "rgb(7, 18, 160)";
+    context.fill();
+    //writes text
+    context.font = "13px FontAwesome";
+    context.fillStyle = "white";
+    context.fillText("\uF041 Destination", endX + 2, endY + 15);
 
-//     //writes names of buildings
-//     context.font = "13px Arial";
-//     context.fillStyle = "slategray";
-//     context.fillText("Main Building", 110, 140);
-//     context.fillText("Engineering Block", 200, 300);
-//     context.fillText("Block B", 60, 220);
-//     context.fillText("Cafeteria", 50, 340);
-//     context.fillText("Hostel Block A", 50, 400);
-//     context.fillText("Hostel Block B", 140, 460);
-//     context.fillText("Hostel Block C", 200, 430);
-//     context.fillText("Airport", 240, 380);
-//     context.fillText("Graduate School", 270, 360);
-//     context.fillText("Football Field", 140, 580);
-//     /*
-// //draws destination icon at destination
-// context.font = "20px FontAwesome";
-// context.fillText('\uF041', endX, endY);
-// */
-//     //draws rectangular background for destination text
-//     context.beginPath();
-//     context.rect(endX, endY, 75, 20);
-//     context.fillStyle = "rgb(7, 18, 160)";
-//     context.fill();
-//     //writes text
-//     context.font = "13px FontAwesome";
-//     context.fillStyle = "white";
-//     context.fillText("\uF041 Destination", endX + 2, endY + 15);
+    //draws users at location 🔵 ⬤
 
-//     //draws users at location 🔵 ⬤
+    context.font = "30px Arial";
+    context.fillStyle = "rgb(30, 144, 255)";
+    context.fillText("⬤", userX, userY);
 
-//     context.font = "30px Arial";
-//     context.fillStyle = "rgb(30, 144, 255)";
-//     context.fillText("⬤", userX, userY);
+    createPoints();
+    drawPath2();
+    //showPathIDs();
 
-//     createPoints();
-//     drawPath2();
-//     //showPathIDs();
+    //draws selected location in filter menu
+    dBags();
+    dCups();
+    dClothes();
+    function dBags() {
+      if (grpArr[0] == 1) {
+        context.fillText("💼", 40, 60);
+        context.fillText("💼", 290, 100);
+      }
+    }
 
-//     //draws selected location in filter menu
-//     dBags();
-//     dCups();
-//     dClothes();
-//     function dBags() {
-//       if (grpArr[0] == 1) {
-//         context.fillText("💼", 40, 60);
-//         context.fillText("💼", 290, 100);
-//       }
-//     }
+    function dCups() {
+      if (grpArr[1] == 1) {
+        context.fillText("🥤", 130, 50);
+        context.fillText("🥤", 160, 40);
+      }
+    }
 
-//     function dCups() {
-//       if (grpArr[1] == 1) {
-//         context.fillText("🥤", 130, 50);
-//         context.fillText("🥤", 160, 40);
-//       }
-//     }
+    function dClothes() {
+      if (grpArr[2] == 1) {
+        context.fillText("👕", 30, 180);
+        context.fillText("👕", 98, 190);
+      }
+    }
 
-//     function dClothes() {
-//       if (grpArr[2] == 1) {
-//         context.fillText("👕", 30, 180);
-//         context.fillText("👕", 98, 190);
-//       }
-//     }
+    /*
+[used to draw user's position on the map]
+checks if values are greater than or equal to minimum
+and less than or equal to maximum (Prevents user from being placed outside the map)
+*/
+    if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
+      var longUnit = (0.22408 - 0.22214) / 430;
+      var longDist = 0.22408 - Math.abs(posX);
+      userX = Math.ceil(longDist / longUnit);
+    }
+    if (posY >= 5.59458 && posY <= 5.5975) {
+      var latUnit = (5.5975 - 5.59458) / 648;
+      var latDist = 5.5975 - posY;
+      userY = Math.ceil(latDist / latUnit);
+    }
 
-//     /*
-// [used to draw user's position on the map]
-// checks if values are greater than or equal to minimum
-// and less than or equal to maximum (Prevents user from being placed outside the map)
-// */
-//     if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
-//       var longUnit = (0.22408 - 0.22214) / 430;
-//       var longDist = 0.22408 - Math.abs(posX);
-//       userX = Math.ceil(longDist / longUnit);
-//     }
-//     if (posY >= 5.59458 && posY <= 5.5975) {
-//       var latUnit = (5.5975 - 5.59458) / 648;
-//       var latDist = 5.5975 - posY;
-//       userY = Math.ceil(latDist / latUnit);
-//     }
+    //displays path IDs
+    function showPathIDs() {
+      pathArr.map((item) => {
+        context.font = "12px Arial";
+        context.fillText(item.id, item.x[0], item.y[0]);
+      });
+    }
 
-//     //displays path IDs
-//     function showPathIDs() {
-//       pathArr.map((item) => {
-//         context.font = "12px Arial";
-//         context.fillText(item.id, item.x[0], item.y[0]);
-//       });
-//     }
-
-//     //used to create animation
-//     window.requestAnimationFrame(drawMe);
-//   }
+    //used to create animation
+    window.requestAnimationFrame(drawMe);
+  }
 
   //sets location to building containing entered location
   function setLocation() {
@@ -1927,6 +1961,7 @@ posLog.innerHTML += "user x: " + userX + ", user y: " + userY + "<hr>";
   function showLocMenu2(x, y) {
     for (i = 0; i < buildingDataArray.length; i++) {
       if (x >= buildingDataArray[i].nameCoords.x1 && x <= buildingDataArray[i].nameCoords.x2 && y >= buildingDataArray[i].nameCoords.y1 && y <= buildingDataArray[i].nameCoords.y2) {
+        console.log("match");
         let mainBuilding = document.getElementById("mainBuilding");
         mainBuilding.style.display = "block";
         mainBuilding.innerHTML = `
@@ -2017,9 +2052,9 @@ the point they click on the map*/
     destination.focus();
   }
 
-  // canvas.addEventListener("mousedown", function (e) {
-  //   getMousePosition(canvas, e);
-  // });
+  canvas.addEventListener("mousedown", function (e) {
+    getMousePosition(canvas, e);
+  });
 
   //generates random numbers to be used as path IDs
   function generateID() {
@@ -2117,10 +2152,9 @@ clr = clearTimeout(set);
   //checks if a location or destination is clicked and sets the appropriate field to the clicked value
   window.onclick = (e) => {
     if (e.target.className == "locResult") {
-      const location = document.getElementById("searchInput");
+      const location = document.getElementById("location");
       location.value = e.target.innerHTML;
       searchResults.innerHTML = "";
-      showLocation();
     } else if (e.target.className == "desResult") {
       const destination = document.getElementById("destination");
       destination.value = e.target.innerHTML;
@@ -2130,11 +2164,14 @@ clr = clearTimeout(set);
       location.value = e.target.innerHTML;
       searchResults.innerHTML = "";
     }
-    //highlight(e.target.innerHTML);
+    highlight(e.target.innerHTML);
   };
 
   function hideMenu(id) {
     let container = document.getElementById(id).style.display = "none";
   }
-  </script>
+
+
+</script>
+
 </html>
