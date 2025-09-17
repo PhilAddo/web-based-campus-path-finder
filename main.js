@@ -257,7 +257,7 @@ let buildingDataArray = [
   },
   {
     name: "Cafeteria",
-    image: "def-loc-img.jpg",
+    image: "cafeteria-img.jpeg",
     description: "Description",
     locations: [
       {
@@ -446,11 +446,11 @@ let buildingDataArray = [
   },
   {
     name: "Graduate School",
-    image: "def-loc-img.jpg",
+    image: "graduate-block-img2.jpeg",
     description: "Description",
     locations: [
       {
-        image: "def-loc-img.jpg",
+        image: "graduate-block-img1.jpeg",
         name: "Graduate School",
         description: "Description",
       },
@@ -518,7 +518,7 @@ let buildingDataArray = [
   },
   {
     name: "Football Field",
-    image: "def-loc-img.jpg",
+    image: "sports-complex-img.jpeg",
     description: "Description",
     locations: [
       {
@@ -661,10 +661,6 @@ function loadBuildingDataArray() {
   }
 }
 
-  
-function showMessage(){
-  alert("Message from other JS file!");
-}
 
 // function isValidJSON(str){
 //   try{
@@ -678,5 +674,4 @@ function showMessage(){
 //console.log(buildingDataArray);
 //localStorage.removeItem('buildingDataArray');
 
-window.onload = loadBuildingDataArray();
-sortLocationsAlphabetically();
+window.onload = loadBuildingDataArray(); listLocations();

@@ -4,9 +4,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <title>Web-Based Campus Path Finder</title>
+  <title>Web-Based Campus Path Finder - Main Campus</title>
   <link rel="stylesheet" href="style2.css" />
-  <script src="main.js"></script>
+  <script src="script.js"></script>
 </head>
 
 <body>
@@ -64,6 +64,13 @@
         <ul style="list-style-type: none" id="locMenuCon">
         </ul>
       </details>
+      <details>
+        <summary class="sideMenuOpt">Map Type</summary>
+        <ul style="list-style-type: none">
+          <li class="sideMenuOpt" onclick="location='index2.html'">Main Campus</li>
+          <li class="sideMenuOpt" onclick="location='index.html'">General Map</li>
+        </ul>
+      </details>
       <!--Emergency information menu-->
       <div class="sideMenuOpt" onclick="showLocMenu(0,0);">
           Emergency Information Menu
@@ -91,7 +98,7 @@
     <span class="buildName"><span class="closeBtn" onclick="hideLocMenu();">&times</span> Emergency
       Menu</span><br /><br /><br />
     <center>
-      <img class="buildImg" src="img/def-loc-img.jpg" />
+      <img class="buildImg" src="img/emergency-menu-img.jpg" />
     </center>
     <p class="locDesc">
       In case of an emergency, access the emergency contacts and follow the
@@ -2106,19 +2113,7 @@ clr = clearTimeout(set);
   `;
   }
 
-  //lists all existing locations in the location menu
-  function listLocations() {
-    let locMenuCon = document.getElementById("locMenuCon");
-    locMenuCon.innerHTML = "";
-    let locArray = sortLocationsAlphabetically();
-    locArray.map((item, index) => {
-      locMenuCon.innerHTML += `
-    <li onclick="showLocDetail(${index});" class="sideMenuOpt">
-            ${item.name}
-          </li>
-    `;
-    })
-  }
+  
 
   //sets the use's location coordinates to the coordinates of the building which contains the selected location 
   function setLocation2(buildingIndex){
@@ -2146,8 +2141,11 @@ clr = clearTimeout(set);
     drawAll = false;
     endX = -50;
     endY = -50;
+    xCoord = [];
+    yCoord = [];
     hideSideMenu();
   }
+
 
   //checks if a location or destination is clicked and sets the appropriate field to the clicked value
   window.onclick = (e) => {

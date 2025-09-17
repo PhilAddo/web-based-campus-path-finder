@@ -1,77 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Web-Based Campus Path Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web-Based Campus Path Finder - General Map</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="style2.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
+
 <body>
   <header>
     <div style="font-size: 20px;">
       <span id="openSideMenuBtn"><i class="fa fa-bars" aria-hidden="true" onclick="showSideMenu();"></i><span
-              class="altTxt" onclick="showSideMenu();">menu</span></span><span id="closeSideMenuBtn"
-            onclick="hideSideMenu();">&times</span>
+          class="altTxt" onclick="showSideMenu();">menu</span></span><span id="closeSideMenuBtn"
+        onclick="hideSideMenu();">&times</span>
     </div>
     <h2>Web-Based Campus Path Finder</h2>
     <div></div>
   </header>
 
-<!--side menu-->
-    <div id="sideMenu">
-      <!--locations menu-->
-      <details>
-        <summary class="sideMenuOpt">Locations</summary>
-        <ul style="list-style-type: none" id="locMenuCon">
-        </ul>
-      </details>
-      <!--Emergency information menu-->
-      <div class="sideMenuOpt" onclick="showLocMenu(0,0);">
-          Emergency Information Menu
-        </div>
-      <div class="sideMenuOpt" onclick="location='admin-login-page.html'">Administrator Log In</div>
+  <!--side menu-->
+  <div id="sideMenu">
+    <!--locations menu-->
+    <details>
+      <summary class="sideMenuOpt">Locations</summary>
+      <ul style="list-style-type: none" id="locMenuCon">
+      </ul>
+    </details>
+    <details>
+      <summary class="sideMenuOpt">Map Type</summary>
+      <ul style="list-style-type: none">
+        <li class="sideMenuOpt" onclick="location='index2.html'">Main Campus</li>
+        <li class="sideMenuOpt" onclick="location='index.html'">General Map</li>
+      </ul>
+    </details>
+    <!--Emergency information menu-->
+    <div class="sideMenuOpt" onclick="showLocMenu(0,0);">
+      Emergency Information Menu
     </div>
+    <div class="sideMenuOpt" onclick="location='admin-login-page.html'">Administrator Log In</div>
   </div>
+  </div>
+
 
   <div id="map-elements">
     <div id="accessibility-tools">
-    <button onclick="toggleContrast()">High Contrast</button>
-    <button onclick="increaseTextSize()">A+</button>
-  </div>
+      <button onclick="toggleContrast()">High Contrast</button>
+      <button onclick="increaseTextSize()">A+</button>
+    </div>
 
-  <div id="search-container">
+    <!-- <div id="search-container">
     <input type="text" id="searchInput" placeholder="Search location..." oninput="searchLoc();checkSearchInput();">
     <button onclick="searchLoc()">Search</button>
     <div id="searchResults"></div>
-  </div>
+  </div> -->
 
-  <div id="route-controls">
+    <!-- <div id="route-controls">
   <button onclick="setRouteMode('start')">Set Start Point</button>
   <button onclick="setRouteMode('end')">Set End Point</button>
   <button onclick="drawRoute()">Draw Route</button>
   <button onclick="clearRoute()">Clear Route</button>
   <button onClick="getUser()">Get Location</button>
-</div>
-<div id="map"></div>
+</div> -->
+    <div id="controls">
+      <input type="search" id="search" placeholder="Enter location" />
+      <button onclick="searchLocation()">Search</button>
+      <button onclick="getUserLocation()">My Location</button>
+      <button onclick="clearRoute()">Clear Route</button>
+      <button onclick="recenterOnCampus();">Recenter on Campus</button>
+    </div>
+    <div id="map"></div>
+  </div>
 
-</div>
-  
 
-<!--main building location contents-->
+
+  <!--main building location contents-->
   <div class="locMenu" id="mainBuilding">
   </div>
 
 
 
-<!--Emergency contacts menu-->
+  <!--Emergency contacts menu-->
   <div class="locMenu" id="emergencyMenu">
     <span class="buildName"><span class="closeBtn" onclick="hideLocMenu();">&times</span> Emergency
       Menu</span><br /><br /><br />
     <center>
-      <img class="buildImg" src="img/def-loc-img.jpg" />
+      <img class="buildImg" src="img/emergency-menu-img.jpg" />
     </center>
     <p class="locDesc">
       In case of an emergency, access the emergency contacts and follow the
@@ -167,7 +185,7 @@
   </div>
 
 
-<div id="loc-info-container" style="display: none;">
+  <div id="loc-info-container" style="display: none;">
     <div class="loc">
       <b id="loc-name-container"><span class="closeBtn" onclick="hideMenu('loc-info-container');">&times</span> Location
         Name</b>
@@ -182,11 +200,343 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
   <script src="script.js"></script>
 </body>
 <script>
-    //sets the default value of the active user value in session storage
+
+  //==== Unique JS codes for the general map ====
+  // let landmarks = {};
+
+  // fetch('landmarks.json')
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     landmarks = data;
+  //     Object.keys(landmarks).forEach(name => {
+  //       L.marker(landmarks[name])
+  //         .addTo(map)
+  //         .bindPopup(`<b>${name.toUpperCase()}</b>`);
+  //     });
+  //   });
+
+  // Initialize map
+  var map = L.map('map').setView([5.596, -0.223], 17);
+
+  // Load OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // const map = L.map('map').setView([5.596, -0.223], 17);
+  // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  //   maxZoom: 20,
+  // }).addTo(map);
+
+  // function searchLocation() {
+  //   const input = document.getElementById("searchInput").value.toLowerCase();
+  //   const coords = landmarks[input];
+
+  //   if (coords) {
+  //     const msg = new SpeechSynthesisUtterance(`Navigating to ${input}`);
+  //     window.speechSynthesis.speak(msg);
+
+  //     map.setView(coords, 18);
+  //     L.popup()
+  //       .setLatLng(coords)
+  //       .setContent(`<b>${input.toUpperCase()}</b>`)
+  //       .openOn(map);
+  //   } else {
+  //     alert("Location not found. Try another name.");
+  //   }
+  // }
+
+  function toggleContrast() {
+    document.body.classList.toggle("high-contrast");
+  }
+
+  function increaseTextSize() {
+    document.body.classList.toggle("large-font");
+  }
+
+  function recenterOnCampus(){
+    map.setView([5.596, -0.223], 17);
+  }
+
+  // Example accessible path
+  const accessiblePath = [
+    [5.6181, -0.2204],
+    [5.6178, -0.2198]
+  ];
+
+  L.polyline(accessiblePath, {
+    color: 'blue',
+    weight: 5,
+    dashArray: '10, 10'
+  }).addTo(map).bindPopup("Accessible Path");
+
+  let routeMode = null;
+  let startPoint = null;
+  let endPoint = null;
+  let routeLine = null;
+
+  function setRouteMode(mode) {
+    routeMode = mode;
+    alert(`Click on the map to set the ${mode} point`);
+  }
+
+  map.on('click', function (e) {
+    if (!routeMode) return;
+
+    if (routeMode === 'start') {
+      if (startPoint) map.removeLayer(startPoint);
+      startPoint = L.marker(e.latlng, { draggable: true }).addTo(map).bindPopup("Start Point").openPopup();
+    }
+
+    if (routeMode === 'end') {
+      if (endPoint) map.removeLayer(endPoint);
+      endPoint = L.marker(e.latlng, { draggable: true }).addTo(map).bindPopup("End Point").openPopup();
+    }
+
+    routeMode = null;
+  });
+
+  function drawRoute() {
+    if (startPoint && endPoint) {
+      const startLatLng = startPoint.getLatLng();
+      const endLatLng = endPoint.getLatLng();
+
+      if (routeLine) map.removeLayer(routeLine);
+
+      routeLine = L.polyline([startLatLng, endLatLng], {
+        color: 'green',
+        weight: 4
+      }).addTo(map).bindPopup("Custom Route").openPopup();
+    } else {
+      alert("Please select both Start and End points.");
+    }
+  }
+
+  function clearRoute() {
+    startPoint.remove();
+    endPoint.remove();
+    routeLine.remove();
+  }
+
+  //gets the user's location
+  function getUser() {
+    map.locate({ setView: true, maxZoom: 16 });
+    //when location is found
+    function onLocationFound(e) {
+      var radius = e.accuracy / 2;
+      //add a marker
+      L.marker(e.latlng).addTo(map).bindPopup(`You are within ${radius} meters from this point`).openPopup();
+
+      //add accuracy circle
+      L.circle(e.latlng, radius).addTo(map);
+    }
+
+    //when location is not found
+    function onLocationError(e) {
+      alert(e.message);
+    }
+
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+  }
+
+  // map.on('click', function(e){
+  //   console.log(`lat: ${e.latlng.lat}, long: ${e.latlng.lng}`);
+  // });
+
+  //marker for Main Building
+  let mainBuildingMarker = L.marker([5.596841187565221, -0.2232778072357178]);
+  mainBuildingMarker.addTo(map);
+  mainBuildingMarker.on('click', function () {
+    showLocMenu2(99, 113);
+  });
+
+  //marker for Block B
+  let blockBMarker = L.marker([5.596520932579942, -0.22373378276824954]);
+  blockBMarker.addTo(map);
+  blockBMarker.on('click', function () {
+    showLocMenu2(51, 213);
+  });
+
+  //marker for Cafeteria
+  let cafeteriaMarker = L.marker([5.596035065040515, -0.2237096428871155]);
+  cafeteriaMarker.addTo(map);
+  cafeteriaMarker.on('click', function () {
+    showLocMenu2(46, 333);
+  });
+
+  //marker for Engineering Block
+  let engineeringBlockMarker = L.marker([5.5961016396499375, -0.22299617528915408]);
+  engineeringBlockMarker.addTo(map);
+  engineeringBlockMarker.on('click', function () {
+    showLocMenu2(190, 296);
+  });
+
+  //marker for Hostel Block A
+  let hostelBlockAMarker = L.marker([5.595703964235648, -0.2236077189445496]);
+  hostelBlockAMarker.addTo(map);
+  hostelBlockAMarker.on('click', function () {
+    showLocMenu2(45, 392);
+  });
+
+  //marker for Hostel Block B
+  let hostelBlockBMarker = L.marker([5.595463928846843, -0.22325634956359866]);
+  hostelBlockBMarker.addTo(map);
+  hostelBlockBMarker.on('click', function () {
+    showLocMenu2(136, 453);
+  });
+
+  //marker for Hostel Block C
+  let hostelBlockCMarker = L.marker([5.5955816621938155, -0.22296130657196048]);
+  hostelBlockCMarker.addTo(map);
+  hostelBlockCMarker.on('click', function () {
+    showLocMenu2(190, 419);
+  });
+
+  //marker for Airport
+  let airportMarker = L.marker([5.59581909725854, -0.22292912006378174]);
+  airportMarker.addTo(map);
+  airportMarker.on('click', function () {
+    showLocMenu2(231, 373);
+  });
+
+  //marker for Graduate School
+  let graduateSchoolMarker = L.marker([5.595919965214853, -0.22272393107414248]);
+  graduateSchoolMarker.addTo(map);
+  graduateSchoolMarker.on('click', function () {
+    showLocMenu2(264, 352);
+  });
+
+  //marker for Great Hall
+  let greatHallMarker = L.marker([5.59552280973244, -0.223897397518158]);
+  greatHallMarker.addTo(map);
+  greatHallMarker.on('click', function () {
+    showLocMenu2(7, 454);
+  });
+
+  //marker for Bush Canteen
+  let bushCanteenMarker = L.marker([5.595234371202593, -0.22369086742401126]);
+  bushCanteenMarker.addTo(map);
+  bushCanteenMarker.on('click', function () {
+    showLocMenu2(48, 494);
+  });
+
+  //marker for Football Field
+  let footballFieldMarker = L.marker([5.59502370788417, -0.2233877778053284]);
+  footballFieldMarker.addTo(map);
+  footballFieldMarker.on('click', function () {
+    showLocMenu2(129, 570);
+  });
+
+  function clearAllLocationMakers() {
+    searchingLocation = true;
+    mainBuildingMarker.remove();
+    blockBMarker.remove();
+    cafeteriaMarker.remove();
+    engineeringBlockMarker.remove();
+    hostelBlockAMarker.remove();
+    hostelBlockBMarker.remove();
+    hostelBlockCMarker.remove();
+    airportMarker.remove();
+    graduateSchoolMarker.remove();
+    greatHallMarker.remove();
+    bushCanteenMarker.remove();
+    footballFieldMarker.remove();
+  }
+
+  function addAllMarkers() {
+    searchingLocation = true;
+    mainBuildingMarker.addTo(map);
+    blockBMarker.addTo(map);
+    cafeteriaMarker.addTo(map);
+    engineeringBlockMarker.addTo(map);
+    hostelBlockAMarker.addTo(map);
+    hostelBlockBMarker.addTo(map);
+    hostelBlockCMarker.addTo(map);
+    airportMarker.addTo(map);
+    graduateSchoolMarker.addTo(map);
+    greatHallMarker.addTo(map);
+    bushCanteenMarker.addTo(map);
+    footballFieldMarker.addTo(map);
+  }
+
+  function checkSearchInput() {
+    var location = document
+      .getElementById("searchInput")
+      .value.trim();
+    if (location == "") {
+      addAllMarkers();
+    }
+  }
+
+  // additional scripts for general map
+  var marker;
+  var routingControl;
+
+  // Search for a location
+  function searchLocation() {
+    var location = document.getElementById("search").value;
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          var lat = data[0].lat;
+          var lon = data[0].lon;
+          if (marker) marker.remove();
+          marker = L.marker([lat, lon]).addTo(map).bindPopup(location).openPopup();
+          map.setView([lat, lon], 14);
+          alert("Now click on destination from the map to get route.");
+        } else {
+          alert("Location not found");
+        }
+      });
+  }
+
+  // Get user's current location
+  function getUserLocation() {
+    navigator.geolocation.getCurrentPosition(position => {
+      var lat = position.coords.latitude;
+      var lon = position.coords.longitude;
+      if (marker) marker.remove();
+      marker = L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+      map.setView([lat, lon], 14);
+    }, () => {
+      alert("Could not retrieve location");
+    });
+  }
+
+  // Clear route
+  function clearRoute() {
+    if (routingControl) {
+      map.removeControl(routingControl);
+      routingControl = null;
+    }
+  }
+
+  // Click on map to set route
+  map.on('click', function (e) {
+    if (!marker) {
+      alert("Search or get your location first!");
+      return;
+    }
+    if (routingControl) map.removeControl(routingControl);
+    routingControl = L.Routing.control({
+      waypoints: [
+        marker.getLatLng(),
+        e.latlng
+      ],
+      routeWhileDragging: true
+    }).addTo(map);
+  });
+
+
+
+  //sets the default value of the active user value in session storage
   sessionStorage.setItem("activeUser", "user");
 
   var posX = 0,
@@ -931,127 +1281,127 @@
 
   window.onload = checkFontA(); listLocations();
 
-//   var canvas = document.getElementById("myCanvas");
+  //   var canvas = document.getElementById("myCanvas");
 
-//   let context = canvas.getContext("2d");
+  //   let context = canvas.getContext("2d");
 
-//   context.lineWidth = 3;
+  //   context.lineWidth = 3;
 
-//   var t = Date.now();
-//   var timePassed = 0;
-//   var dir = 0;
+  //   var t = Date.now();
+  //   var timePassed = 0;
+  //   var dir = 0;
 
 
-//   function drawMe() {
-//     //calculating for frames per second
-//     timePassed = (Date.now() - t) / 1000;
-//     t = Date.now();
-//     var fps = Math.round(1 / timePassed);
+  //   function drawMe() {
+  //     //calculating for frames per second
+  //     timePassed = (Date.now() - t) / 1000;
+  //     t = Date.now();
+  //     var fps = Math.round(1 / timePassed);
 
-//     //clears the canvas for redraw
-//     context.clearRect(0, 0, 650 * 2, 450 * 2);
+  //     //clears the canvas for redraw
+  //     context.clearRect(0, 0, 650 * 2, 450 * 2);
 
-//     //draws map image
-//     const myMap = document.getElementById("map");
-//     context.drawImage(myMap, bgX, bgY, 430, 648);
+  //     //draws map image
+  //     const myMap = document.getElementById("map");
+  //     context.drawImage(myMap, bgX, bgY, 430, 648);
 
-//     drawPath(tempPathObj);
-//     drawAllPaths(pathArr);
+  //     drawPath(tempPathObj);
+  //     drawAllPaths(pathArr);
 
-//     //draws google logo
-//       const googleLogo = document.getElementById("googleLogo");
-//       context.drawImage(googleLogo, 10, 610, 60, 30);
+  //     //draws google logo
+  //       const googleLogo = document.getElementById("googleLogo");
+  //       context.drawImage(googleLogo, 10, 610, 60, 30);
 
-//     //writes names of buildings
-//     context.font = "13px Arial";
-//     context.fillStyle = "slategray";
-//     context.fillText("Main Building", 110, 140);
-//     context.fillText("Engineering Block", 200, 300);
-//     context.fillText("Block B", 60, 220);
-//     context.fillText("Cafeteria", 50, 340);
-//     context.fillText("Hostel Block A", 50, 400);
-//     context.fillText("Hostel Block B", 140, 460);
-//     context.fillText("Hostel Block C", 200, 430);
-//     context.fillText("Airport", 240, 380);
-//     context.fillText("Graduate School", 270, 360);
-//     context.fillText("Football Field", 140, 580);
-//     /*
-// //draws destination icon at destination
-// context.font = "20px FontAwesome";
-// context.fillText('\uF041', endX, endY);
-// */
-//     //draws rectangular background for destination text
-//     context.beginPath();
-//     context.rect(endX, endY, 75, 20);
-//     context.fillStyle = "rgb(7, 18, 160)";
-//     context.fill();
-//     //writes text
-//     context.font = "13px FontAwesome";
-//     context.fillStyle = "white";
-//     context.fillText("\uF041 Destination", endX + 2, endY + 15);
+  //     //writes names of buildings
+  //     context.font = "13px Arial";
+  //     context.fillStyle = "slategray";
+  //     context.fillText("Main Building", 110, 140);
+  //     context.fillText("Engineering Block", 200, 300);
+  //     context.fillText("Block B", 60, 220);
+  //     context.fillText("Cafeteria", 50, 340);
+  //     context.fillText("Hostel Block A", 50, 400);
+  //     context.fillText("Hostel Block B", 140, 460);
+  //     context.fillText("Hostel Block C", 200, 430);
+  //     context.fillText("Airport", 240, 380);
+  //     context.fillText("Graduate School", 270, 360);
+  //     context.fillText("Football Field", 140, 580);
+  //     /*
+  // //draws destination icon at destination
+  // context.font = "20px FontAwesome";
+  // context.fillText('\uF041', endX, endY);
+  // */
+  //     //draws rectangular background for destination text
+  //     context.beginPath();
+  //     context.rect(endX, endY, 75, 20);
+  //     context.fillStyle = "rgb(7, 18, 160)";
+  //     context.fill();
+  //     //writes text
+  //     context.font = "13px FontAwesome";
+  //     context.fillStyle = "white";
+  //     context.fillText("\uF041 Destination", endX + 2, endY + 15);
 
-//     //draws users at location 🔵 ⬤
+  //     //draws users at location 🔵 ⬤
 
-//     context.font = "30px Arial";
-//     context.fillStyle = "rgb(30, 144, 255)";
-//     context.fillText("⬤", userX, userY);
+  //     context.font = "30px Arial";
+  //     context.fillStyle = "rgb(30, 144, 255)";
+  //     context.fillText("⬤", userX, userY);
 
-//     createPoints();
-//     drawPath2();
-//     //showPathIDs();
+  //     createPoints();
+  //     drawPath2();
+  //     //showPathIDs();
 
-//     //draws selected location in filter menu
-//     dBags();
-//     dCups();
-//     dClothes();
-//     function dBags() {
-//       if (grpArr[0] == 1) {
-//         context.fillText("💼", 40, 60);
-//         context.fillText("💼", 290, 100);
-//       }
-//     }
+  //     //draws selected location in filter menu
+  //     dBags();
+  //     dCups();
+  //     dClothes();
+  //     function dBags() {
+  //       if (grpArr[0] == 1) {
+  //         context.fillText("💼", 40, 60);
+  //         context.fillText("💼", 290, 100);
+  //       }
+  //     }
 
-//     function dCups() {
-//       if (grpArr[1] == 1) {
-//         context.fillText("🥤", 130, 50);
-//         context.fillText("🥤", 160, 40);
-//       }
-//     }
+  //     function dCups() {
+  //       if (grpArr[1] == 1) {
+  //         context.fillText("🥤", 130, 50);
+  //         context.fillText("🥤", 160, 40);
+  //       }
+  //     }
 
-//     function dClothes() {
-//       if (grpArr[2] == 1) {
-//         context.fillText("👕", 30, 180);
-//         context.fillText("👕", 98, 190);
-//       }
-//     }
+  //     function dClothes() {
+  //       if (grpArr[2] == 1) {
+  //         context.fillText("👕", 30, 180);
+  //         context.fillText("👕", 98, 190);
+  //       }
+  //     }
 
-//     /*
-// [used to draw user's position on the map]
-// checks if values are greater than or equal to minimum
-// and less than or equal to maximum (Prevents user from being placed outside the map)
-// */
-//     if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
-//       var longUnit = (0.22408 - 0.22214) / 430;
-//       var longDist = 0.22408 - Math.abs(posX);
-//       userX = Math.ceil(longDist / longUnit);
-//     }
-//     if (posY >= 5.59458 && posY <= 5.5975) {
-//       var latUnit = (5.5975 - 5.59458) / 648;
-//       var latDist = 5.5975 - posY;
-//       userY = Math.ceil(latDist / latUnit);
-//     }
+  //     /*
+  // [used to draw user's position on the map]
+  // checks if values are greater than or equal to minimum
+  // and less than or equal to maximum (Prevents user from being placed outside the map)
+  // */
+  //     if (Math.abs(posX) >= 0.22214 && Math.abs(posX) <= 0.22408) {
+  //       var longUnit = (0.22408 - 0.22214) / 430;
+  //       var longDist = 0.22408 - Math.abs(posX);
+  //       userX = Math.ceil(longDist / longUnit);
+  //     }
+  //     if (posY >= 5.59458 && posY <= 5.5975) {
+  //       var latUnit = (5.5975 - 5.59458) / 648;
+  //       var latDist = 5.5975 - posY;
+  //       userY = Math.ceil(latDist / latUnit);
+  //     }
 
-//     //displays path IDs
-//     function showPathIDs() {
-//       pathArr.map((item) => {
-//         context.font = "12px Arial";
-//         context.fillText(item.id, item.x[0], item.y[0]);
-//       });
-//     }
+  //     //displays path IDs
+  //     function showPathIDs() {
+  //       pathArr.map((item) => {
+  //         context.font = "12px Arial";
+  //         context.fillText(item.id, item.x[0], item.y[0]);
+  //       });
+  //     }
 
-//     //used to create animation
-//     window.requestAnimationFrame(drawMe);
-//   }
+  //     //used to create animation
+  //     window.requestAnimationFrame(drawMe);
+  //   }
 
   //sets location to building containing entered location
   function setLocation() {
@@ -1956,8 +2306,8 @@ posLog.innerHTML += "user x: " + userX + ", user y: " + userY + "<hr>";
     }
     //shows the details of the destination using the currentLocationIndex value
     if (x >= endX && x <= endX + 110 && y >= endY && y <= endY + 20) {
-        showLocDetail(currentLocationIndex);
-      }
+      showLocDetail(currentLocationIndex);
+    }
 
   }
 
@@ -2086,13 +2436,13 @@ clr = clearTimeout(set);
   }
 
   //sets the use's location coordinates to the coordinates of the building which contains the selected location 
-  function setLocation2(buildingIndex){
+  function setLocation2(buildingIndex) {
     userX = buildingDataArray[buildingIndex].position.x;
     userY = buildingDataArray[buildingIndex].position.y;
   }
 
   //sets the use's destination coordinates to the coordinates of the building which contains the selected location 
-  function setDestination2(buildingIndex, locationIndex){
+  function setDestination2(buildingIndex, locationIndex) {
     endX = buildingDataArray[buildingIndex].position.x;
     endY = buildingDataArray[buildingIndex].position.y;
     setDestination();
@@ -2101,13 +2451,13 @@ clr = clearTimeout(set);
   }
 
   //shows all paths which leads to the building where the chosen location can be found
-  function showDestinationPaths(buildingIndex){
+  function showDestinationPaths(buildingIndex) {
     pathArr = buildingDataArray[buildingIndex].paths;
     drawAll = true;
   }
 
   //clears paths drawn on canvas
-  function clearPaths(){
+  function clearPaths() {
     drawAll = false;
     endX = -50;
     endY = -50;
@@ -2136,5 +2486,6 @@ clr = clearTimeout(set);
   function hideMenu(id) {
     let container = document.getElementById(id).style.display = "none";
   }
-  </script>
+</script>
+
 </html>

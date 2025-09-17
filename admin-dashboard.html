@@ -29,6 +29,7 @@
           onclick="goToPage('edit-paths.html');"
         /> -->
       </div>
+      <p style="color: red; cursor: pointer;" onclick="resetSite();">[Reset site]</p>
     </div>
   </body>
   <script>
@@ -49,5 +50,12 @@ function logOut(){
   window.location.href = "admin-login-page.html";
 }
 
+function resetSite(){
+  let res = confirm("Are you sure you want to reset site data? All stored data will be lost.");
+  if(res == true){
+    localStorage.removeItem('buildingDataArray');
+    alert("Site data cleared");
+  }
+}
   </script>
 </html>

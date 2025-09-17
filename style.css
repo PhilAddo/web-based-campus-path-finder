@@ -46,3 +46,31 @@ body.large-font * {
   margin: 5px;
   padding: 8px 12px;
 }
+
+/* additional styles for the general map */
+#controls {
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            overflow: scroll;
+        }
+        
+        input,
+        button {
+            margin: 5px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        
+        .container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .Right-image {
+            width: 80px;
+            /*adjust size as needed */
+            height: auto;
+            margin-right: auto;
+        }

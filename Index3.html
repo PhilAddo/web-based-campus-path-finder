@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GCTU WEB BASED PATHFINDER</title>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map Navigation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            height: 80vh;
+            width: 100%;
+        }
+        
+        #controls {
+            padding: 10px;
+            background: #FFD700;
+            display: flex;
+            flex-direction: row;
+        }
+        
+        input,
+        button {
+            margin: 5px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        
+        .container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .Right-image {
+            width: 80px;
+            /*adjust size as needed */
+            height: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="controls">
+        <h3>GCTU WEB BASED<br>PATHFINDER</h3>
+        <span class="container">
+            <img src="logo.png" alt="image" class="Right-image">
+        </span>
+        <div id="controls">
+            <input type="text" id="search" placeholder="Enter location" />
+            <button onclick="searchLocation()">Search</button>
+            <button onclick="getUserLocation()">My Location</button>
+            <button onclick="clearRoute()">Clear Route</button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([40.7128, -74.0060], 12); // Default: NYC
+
+        // Load OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+        var routingControl;
+
+        // Search for a location
+        function searchLocation() {
+            var location = document.getElementById("search").value;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = data[0].lat;
+                        var lon = data[0].lon;
+                        if (marker) marker.remove();
+                        marker = L.marker([lat, lon]).addTo(map).bindPopup(location).openPopup();
+                        map.setView([lat, lon], 14);
+                    } else {
+                        alert("Location not found");
+                    }
+                });
+        }
+
+        // Get user's current location
+        function getUserLocation() {
+            navigator.geolocation.getCurrentPosition(position => {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                if (marker) marker.remove();
+                marker = L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+                map.setView([lat, lon], 14);
+            }, () => {
+                alert("Could not retrieve location");
+            });
+        }
+
+        // Clear route
+        function clearRoute() {
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+        }
+
+        // Click on map to set route
+        map.on('click', function(e) {
+            if (!marker) {
+                alert("Search or get your location first!");
+                return;
+            }
+            if (routingControl) map.removeControl(routingControl);
+            routingControl = L.Routing.control({
+                waypoints: [
+                    marker.getLatLng(),
+                    e.latlng
+                ],
+                routeWhileDragging: true
+            }).addTo(map);
+        });
+
+        //marker for Main Building
+let mainBuildingMarker = L.marker([5.596841187565221, -0.2232778072357178]);
+  mainBuildingMarker.addTo(map);
+mainBuildingMarker.on('click', function(){
+  alert("Clicked!");
+});
+    </script>
+    <marquee behavior="" direction="">WELCOME TO GCTU PATHFINDER</marquee>
+</body>
+
+</html>
+
+<body>
+
+</body>
+
+</html>
